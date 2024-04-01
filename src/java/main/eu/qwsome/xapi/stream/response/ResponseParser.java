@@ -15,11 +15,6 @@ import eu.qwsome.xapi.stream.records.response.STradeStatusRecord;
 
 public class ResponseParser {
 
-  public LoginResponse parseLogin(String body) {
-    return new LoginResponse(body);
-  }
-
-
   public BaseResponseRecord parse(final String command, final JSONObject json) {
 
     final var object = getObject(command);
@@ -53,5 +48,25 @@ public class ResponseParser {
       }
     }
     return result;
+  }
+
+
+  public LoginResponse parseLogin(String body) {
+    return new LoginResponse(body);
+  }
+
+
+  public TradeTransactionResponse parseTradeTransaction(String body) {
+    return new TradeTransactionResponse(body);
+  }
+
+
+  public AllSymbolsResponse parseAllSymbols(final String text) {
+    return new AllSymbolsResponse(text);
+  }
+
+
+  public SymbolResponse parseGetSymbol(final String text) {
+    return new SymbolResponse(text);
   }
 }

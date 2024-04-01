@@ -67,7 +67,7 @@ public class SymbolRecord implements BaseResponseRecord {
       this.setCategoryName(e.getString("categoryName"));
       this.setCurrency(e.getString("currency"));
       this.setDescription(e.getString("description"));
-      this.setExpiration(e.getLong("expiration"));
+      this.setExpiration(e.optLongObject("expiration", null));
       this.setGroupName(e.getString("groupName"));
       this.setHigh(e.getDouble("high"));
       this.setInstantMaxVolume(e.getInt("instantMaxVolume"));
@@ -77,7 +77,7 @@ public class SymbolRecord implements BaseResponseRecord {
       this.setLow(e.getDouble("low"));
       this.setPrecision(e.getInt("precision"));
       this.setStepRuleId(e.getInt("stepRuleId"));
-      this.setStarting(e.getLong("starting"));
+      this.setStarting(e.optLongObject("starting", null));
       this.setStopsLevel(e.getInt("stopsLevel"));
       this.setSymbol(e.getString("symbol"));
       this.setQuoteId(e.getInt("quoteId"));

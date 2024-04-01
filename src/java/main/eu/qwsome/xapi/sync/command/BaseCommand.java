@@ -2,11 +2,13 @@ package eu.qwsome.xapi.sync.command;
 
 import java.util.Objects;
 
+import lombok.ToString;
 import org.json.JSONObject;
 
 /**
  * Abstract base class for each Command.
  */
+@ToString
 public abstract class BaseCommand {
 
   protected String commandName;
@@ -49,12 +51,5 @@ public abstract class BaseCommand {
     obj.put("prettyPrint", false);
     obj.put("arguments", this.arguments);
     return obj.toString();
-  }
-
-
-  @Override
-  public String toString() {
-    return "BaseCommand [commandName=" + this.commandName + ", arguments="
-           + this.arguments + "]";
   }
 }

@@ -23,11 +23,11 @@ public class BaseResponse {
   public BaseResponse(final String body) {
     try {
       final var ob = new JSONObject(body);
-      this.status = (Boolean) ob.get("status");
+      this.status = ob.getBoolean("status");
       this.errCode = ob.has("errorCode") ? new ErrorCode(ob.getString("errorCode")) : null;
-      this.errorDescr = ob.has("errorDescr") ? ob.getString("errorDescr") : null;
+      this.errorDescr = ob.optString("errorDescr");
       this.returnData = ob.has("returnData") ? ob.get("returnData") : null;
-      this.streamSessionId = ob.getString("streamSessionId");
+      this.streamSessionId = ob.optString("streamSessionId");
 
       parseRedirect(ob);
     } catch (final JSONException e) {

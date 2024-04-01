@@ -1,18 +1,17 @@
 package eu.qwsome.xapi;
 
 import java.time.Duration;
-import java.util.concurrent.Semaphore;
 
+import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
-import org.jetbrains.annotations.NotNull;
 
+import eu.qwsome.xapi.stream.records.request.TradeTransInfoRecord;
 import eu.qwsome.xapi.stream.records.response.SBalanceRecord;
 import eu.qwsome.xapi.stream.records.response.SCandleRecord;
 import eu.qwsome.xapi.stream.records.response.SKeepAliveRecord;
@@ -21,7 +20,10 @@ import eu.qwsome.xapi.stream.records.response.SProfitRecord;
 import eu.qwsome.xapi.stream.records.response.STickRecord;
 import eu.qwsome.xapi.stream.records.response.STradeRecord;
 import eu.qwsome.xapi.stream.records.response.STradeStatusRecord;
-import eu.qwsome.xapi.stream.response.ResponseParser;
+import eu.qwsome.xapi.stream.response.AllSymbolsResponse;
+import eu.qwsome.xapi.stream.response.LoginResponse;
+import eu.qwsome.xapi.stream.response.SymbolResponse;
+import eu.qwsome.xapi.stream.response.TradeTransactionResponse;
 import eu.qwsome.xapi.stream.subscription.BalanceStop;
 import eu.qwsome.xapi.stream.subscription.BalanceSubscribe;
 import eu.qwsome.xapi.stream.subscription.CandlesStop;
@@ -39,7 +41,9 @@ import eu.qwsome.xapi.stream.subscription.TradeRecordsSubscribe;
 import eu.qwsome.xapi.stream.subscription.TradeStatusRecordsStop;
 import eu.qwsome.xapi.stream.subscription.TradeStatusRecordsSubscribe;
 import eu.qwsome.xapi.sync.Credentials;
+import eu.qwsome.xapi.sync.command.AllSymbolsCommand;
 import eu.qwsome.xapi.sync.command.LoginCommand;
+import eu.qwsome.xapi.sync.command.SymbolCommand;
 
 @Slf4j
 public class XAPIClient {
@@ -48,44 +52,44 @@ public class XAPIClient {
       .pingInterval(Duration.ofSeconds(30))
       .build();
   private final String symbol;
+  private final String url;
 
   private String sessionId;
   private WebSocket syncWebsocket;
 
   private WebSocket streamWebsocket;
-  private String url;
   private final StreamWebSocketListener streamWebSocketListener = new StreamWebSocketListener();
-  private final Semaphore connectionSemaphore = new Semaphore(0);
+  private final MainWebsocketListener syncListener = new MainWebsocketListener();
 
 
-  public XAPIClient(final String symbol) {
+  public XAPIClient(final String symbol, final String url) {
     this.symbol = symbol;
+    this.url = url;
   }
 
 
-  @SneakyThrows
-  public void connect(final String url, final Credentials credentials) {
+  public @NonNull Single<LoginResponse> connect(final Credentials credentials) {
     final var request = new Request.Builder()
-        .url(url)
+        .url(this.url)
         .build();
 
-    this.url = url;
-    this.syncWebsocket = this.client.newWebSocket(request, new WebSocketListener() {
-      @Override
-      public void onMessage(@NotNull final WebSocket webSocket, @NotNull final String text) {
-        log.debug("onMessage {}", text);
-
-        final var loginResponse = new ResponseParser().parseLogin(text);
-        connectStream(loginResponse.getStreamSessionId());
-        XAPIClient.this.connectionSemaphore.release();
-      }
-    });
-    this.syncWebsocket.send(new LoginCommand(credentials).toJSONString());
-    this.connectionSemaphore.acquire();
+    this.syncWebsocket = this.client.newWebSocket(request, this.syncListener);
+    return login(credentials);
   }
 
 
-  public void connectStream(final String sessionId) {
+  private @NonNull Single<LoginResponse> login(final Credentials credentials) {
+    return this.syncListener.createLoginStream()
+        .doOnSubscribe(disposable -> {
+          this.syncListener.setCommand("login");
+          this.syncWebsocket.send(new LoginCommand(credentials).toJSONString());
+        }).doOnSuccess(loginResponse -> connectStream(loginResponse.getStreamSessionId()))
+        .observeOn(Schedulers.io())
+        ;
+  }
+
+
+  private void connectStream(final String sessionId) {
     this.sessionId = sessionId;
     final var request = new Request.Builder()
         .url(this.url.concat("Stream"))
@@ -94,44 +98,77 @@ public class XAPIClient {
   }
 
 
+  public AllSymbolsResponse getAllSymbols() {
+    return this.syncListener.createAllSymbolsStream()
+        .doOnSubscribe(disposable -> {
+          this.syncListener.setCommand("allSymbols");
+          this.syncWebsocket.send(new AllSymbolsCommand().toJSONString());
+        })
+        .blockingGet();
+  }
+
+
+  public SymbolResponse getSymbol() {
+    return this.syncListener.createGetSymbolsStream()
+        .doOnSubscribe(disposable -> {
+          this.syncListener.setCommand("getSymbol");
+          this.syncWebsocket.send(new SymbolCommand(this.symbol).toJSONString());
+        }).blockingGet();
+  }
+
+
+  public TradeTransactionResponse operatePosition(final TradeTransInfoRecord tradeTransInfoRecord) {
+    return this.syncListener.createTradeTransactionStream()
+        .doOnSubscribe(disposable -> {
+          this.syncListener.setCommand("buy");
+          this.syncWebsocket.send(tradeTransInfoRecord.toJSONObject().toString());
+        })
+        .blockingGet();
+  }
+
+
   public static void main(final String[] args) {
-    final var xapiClient = new XAPIClient("ETHEREUM");
-    xapiClient.connect(
-        "wss://ws.xtb.com/demo",
-        new Credentials(
+    final var xapiClient = new XAPIClient("ETHEREUM", "wss://ws.xtb.com/demo");
+
+    xapiClient.connect(new Credentials(
             System.getenv("LOGIN"),
             System.getenv("PASSWORD")
-        )
-    );
+        ))
+        .subscribe(loginResponse -> {
+          xapiClient.createBalanceStream()
+              .subscribeOn(Schedulers.io())
+              .subscribe(x -> log.info("{}", x));
 
-    xapiClient.createBalanceStream()
-        .subscribeOn(Schedulers.io())
-        .subscribe(x -> log.info("{}", x));
+          xapiClient.createCandleStream()
+              .subscribeOn(Schedulers.io())
+              .subscribe(x -> log.info("{}", x));
 
-    xapiClient.createCandleStream()
-        .subscribeOn(Schedulers.io())
-        .subscribe(x -> log.info("{}", x));
+          xapiClient.createPriceStream()
+              .subscribeOn(Schedulers.io())
+              .subscribe(x -> log.info("{}", x));
 
-    xapiClient.createPriceStream()
-        .subscribeOn(Schedulers.io())
-        .subscribe(x -> log.info("{}", x));
+          xapiClient.createTradesStream()
+              .subscribeOn(Schedulers.io())
+              .subscribe(x -> log.info("{}", x));
 
-    xapiClient.createTradesStream()
-        .subscribeOn(Schedulers.io())
-        .subscribe(x -> log.info("{}", x));
+          xapiClient.createTradesStatusStream()
+              .subscribeOn(Schedulers.io())
+              .subscribe(x -> log.info("{}", x));
 
-    xapiClient.createTradesStatusStream()
-        .subscribeOn(Schedulers.io())
-        .subscribe(x -> log.info("{}", x));
+          xapiClient.createProfitsStream()
+              .subscribeOn(Schedulers.io())
+              .subscribe(x -> log.info("{}", x));
 
-    xapiClient.createProfitsStream()
-        .subscribeOn(Schedulers.io())
-        .subscribe(x -> log.info("{}", x));
+          xapiClient.createTradesStatusStream()
+              .subscribeOn(Schedulers.io())
+              .subscribe(x -> log.info("{}", x));
 
-    xapiClient.createTradesStatusStream()
-        .subscribeOn(Schedulers.io())
-        .subscribe(x -> log.info("{}", x));
+          final var x = xapiClient.getSymbol();
+          log.info("getSymbol {}", x);
 
+          final var y = xapiClient.getAllSymbols();
+          log.info("getAllSymbols {}", y);
+        });
   }
 
 
@@ -213,10 +250,10 @@ public class XAPIClient {
   /**
    * Unsubscribes prices of a symbol
    */
-  public void unsubscribePrice(final String symbol) {
+  public void unsubscribePrice() {
     this.streamWebsocket.send(
         TickPricesStop.builder()
-            .symbol(symbol)
+            .symbol(this.symbol)
             .build()
             .toJSONString()
     );
@@ -423,6 +460,4 @@ public class XAPIClient {
 
     this.streamWebSocketListener.unsubscribeTradeStatus();
   }
-
-
 }
