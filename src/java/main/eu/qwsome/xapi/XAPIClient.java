@@ -87,6 +87,7 @@ public class XAPIClient {
     LOG.trace("keepAlive(minute={})", minute);
 
     this.syncWebsocket.send(new PingCommand().toJSONString());
+    this.streamWebsocket.send(new PingCommand().toJSONString());
   }
 
 
@@ -98,11 +99,11 @@ public class XAPIClient {
           this.syncListener.setCommand("login");
           this.syncWebsocket.send(new LoginCommand(credentials).toJSONString());
         }).doOnSuccess(loginResponse -> {
-          Observable.timer(10, TimeUnit.MINUTES)
+          connectStream(loginResponse.getStreamSessionId());
+
+          Observable.timer(9, TimeUnit.MINUTES)
               .subscribeOn(Schedulers.io())
               .subscribe(this::keepAlive);
-
-          connectStream(loginResponse.getStreamSessionId());
         })
         ;
   }
