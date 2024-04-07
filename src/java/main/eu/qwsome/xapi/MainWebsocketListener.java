@@ -4,7 +4,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import io.reactivex.rxjava3.subjects.PublishSubject;
+import io.reactivex.rxjava3.subjects.UnicastSubject;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
@@ -24,10 +24,10 @@ import eu.qwsome.xapi.stream.response.TradeTransactionResponse;
 @Slf4j
 public class MainWebsocketListener extends WebSocketListener {
 
-  private final PublishSubject<LoginResponse> loginSubject = PublishSubject.create();
-  private final PublishSubject<TradeTransactionResponse> tradeTransactionSubject = PublishSubject.create();
-  private final PublishSubject<AllSymbolsResponse> allSymbolsSubject = PublishSubject.create();
-  private final PublishSubject<SymbolResponse> getSymbolSubject = PublishSubject.create();
+  private final UnicastSubject<LoginResponse> loginSubject = UnicastSubject.create();
+  private final UnicastSubject<TradeTransactionResponse> tradeTransactionSubject = UnicastSubject.create();
+  private final UnicastSubject<AllSymbolsResponse> allSymbolsSubject = UnicastSubject.create();
+  private final UnicastSubject<SymbolResponse> getSymbolSubject = UnicastSubject.create();
 
   private final LinkedBlockingDeque<String> command = new LinkedBlockingDeque<>(1);
 
