@@ -528,4 +528,10 @@ public class XAPIClient {
 
     this.streamWebSocketListener.unsubscribeTradeStatus();
   }
+
+
+  public void disconnect() {
+    this.syncWebsocket.close(1000, "AppShutdown");
+    this.streamWebsocket.close(1000, "AppShutdown");
+  }
 }
