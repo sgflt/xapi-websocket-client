@@ -9,7 +9,6 @@ public class PingCommand extends BaseCommand {
     super(new JSONObject());
   }
 
-
   @Override
   public String getCommandName() {
     return "ping";
