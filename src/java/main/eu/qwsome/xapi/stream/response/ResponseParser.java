@@ -69,4 +69,9 @@ public class ResponseParser {
   public SymbolResponse parseGetSymbol(final String text) {
     return new SymbolResponse(text);
   }
+
+
+  public TradesResponse parseGetTrades(final String text) {
+    return new TradesResponse(text);
+  }
 }

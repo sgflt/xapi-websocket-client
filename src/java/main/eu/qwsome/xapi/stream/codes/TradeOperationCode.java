@@ -1,5 +1,8 @@
 package eu.qwsome.xapi.stream.codes;
 
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode(callSuper = true)
 public class TradeOperationCode extends ResponseCode {
 
   public static final TradeOperationCode BUY = new TradeOperationCode(0L);
@@ -14,5 +17,10 @@ public class TradeOperationCode extends ResponseCode {
 
   public TradeOperationCode(final long code) {
     super(code);
+  }
+
+
+  public static TradeOperationCode of(int code) {
+    return new TradeOperationCode(code);
   }
 }

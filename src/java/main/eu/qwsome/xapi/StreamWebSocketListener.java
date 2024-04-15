@@ -2,7 +2,6 @@ package eu.qwsome.xapi;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 import okhttp3.WebSocket;
@@ -22,7 +21,6 @@ import eu.qwsome.xapi.stream.records.response.STradeStatusRecord;
 import eu.qwsome.xapi.stream.response.ResponseParser;
 
 @Slf4j
-@Getter
 public class StreamWebSocketListener extends WebSocketListener {
 
   private final PublishSubject<SBalanceRecord> balanceSubject = PublishSubject.create();
@@ -84,6 +82,8 @@ public class StreamWebSocketListener extends WebSocketListener {
           this.priceSubject.onNext(tickRecord);
         } else if (brr instanceof final STradeRecord tradeRecord) {
           this.tradeSubject.onNext(tradeRecord);
+        } else if (brr instanceof final STradeStatusRecord tradeStatusRecord) {
+          this.tradeStatusSubject.onNext(tradeStatusRecord);
         } else if (brr instanceof final SNewsRecord newsRecord) {
           this.newsSubject.onNext(newsRecord);
         } else if (brr instanceof final SCandleRecord candleRecord) {

@@ -20,22 +20,24 @@ public class TradeTransInfoRecord {
   private final Double volume;
   private final Long order;
   private final Long expiration;
+  private final Double offset;
   private final String customComment;
 
 
   public JSONObject toJSONObject() {
-    // TODO možná půjde  new JSONObject(this)
     final var obj = new JSONObject();
     obj.put("cmd", this.cmd.getCode());
-    obj.put("type", this.type.getCode());
-    obj.put("price", this.price);
-    obj.put("sl", this.sl);
-    obj.put("tp", this.tp);
-    obj.put("symbol", this.symbol);
-    obj.put("volume", this.volume);
-    obj.put("order", this.order);
     obj.put("customComment", this.customComment);
     obj.put("expiration", this.expiration);
-    return obj;
+    obj.put("offset", this.offset);
+    obj.put("order", this.order);
+    obj.put("price", this.price);
+    obj.put("sl", this.sl);
+    obj.put("symbol", this.symbol);
+    obj.put("tp", this.tp);
+    obj.put("type", this.type.getCode());
+    obj.put("volume", this.volume);
+
+    return new JSONObject().put("tradeTransInfo", obj);
   }
 }

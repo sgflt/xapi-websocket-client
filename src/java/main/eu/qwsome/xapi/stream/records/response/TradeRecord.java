@@ -19,12 +19,12 @@ public class TradeRecord extends WrapperTradeRecord {
     super.setFieldsFromJSONObject(ob);
     this.timestamp = ob.getLong("timestamp");
 
-    this.open_time = ob.getLong("open_time");
+    this.open_time = ob.optLongObject("open_time");
 
-    super.close_time = ob.getLong("close_time");
-    super.expiration = ob.getLong("expiration");
+    super.close_time = ob.optLongObject("close_time", null);
+    super.expiration = ob.optLongObject("expiration", null);
     super.position = ob.getLong("position");
-    super.profit = ob.getDouble("profit");
+    super.profit = ob.optDouble("profit");
     super.sl = ob.getDouble("sl");
     super.tp = ob.getDouble("tp");
   }
