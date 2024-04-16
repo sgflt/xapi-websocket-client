@@ -12,6 +12,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
 
+import eu.qwsome.xapi.stream.codes.TradeOperationCode;
+import eu.qwsome.xapi.stream.codes.TradeTransactionType;
 import eu.qwsome.xapi.stream.records.request.TradeTransInfoRecord;
 import eu.qwsome.xapi.stream.records.response.SBalanceRecord;
 import eu.qwsome.xapi.stream.records.response.SCandleRecord;
@@ -25,6 +27,7 @@ import eu.qwsome.xapi.stream.response.AllSymbolsResponse;
 import eu.qwsome.xapi.stream.response.LoginResponse;
 import eu.qwsome.xapi.stream.response.SymbolResponse;
 import eu.qwsome.xapi.stream.response.TradeTransactionResponse;
+import eu.qwsome.xapi.stream.response.TradeTransactionStatusResponse;
 import eu.qwsome.xapi.stream.response.TradesResponse;
 import eu.qwsome.xapi.stream.subscription.BalanceStop;
 import eu.qwsome.xapi.stream.subscription.BalanceSubscribe;
@@ -48,6 +51,7 @@ import eu.qwsome.xapi.sync.command.AllSymbolsCommand;
 import eu.qwsome.xapi.sync.command.LoginCommand;
 import eu.qwsome.xapi.sync.command.SymbolCommand;
 import eu.qwsome.xapi.sync.command.TradeTransactionCommand;
+import eu.qwsome.xapi.sync.command.TradeTransactionStatusCommand;
 import eu.qwsome.xapi.sync.command.TradesCommand;
 
 @Slf4j
@@ -154,12 +158,39 @@ public class XAPIClient {
   }
 
 
+  public TradeTransactionStatusResponse getTransactionStatus(long orderId) {
+    log.trace("getTransactionStatus()");
+
+    return this.syncListener.createTradeTransactionStatusStream()
+        .doOnSubscribe(disposable -> {
+          this.syncListener.setCommand("transactionStatus");
+          this.syncWebsocket.send(new TradeTransactionStatusCommand(orderId).toJSONString());
+        }).blockingGet();
+  }
+
+
   public TradeTransactionResponse operatePosition(final TradeTransInfoRecord tradeTransInfoRecord) {
     log.debug("operatePosition(tradeTransInfoRecord={})", tradeTransInfoRecord);
 
     return this.syncListener.createTradeTransactionStream()
         .doOnSubscribe(disposable -> {
-          this.syncListener.setCommand("buy");
+          if (
+              tradeTransInfoRecord.getCmd().equals(TradeOperationCode.BUY)
+              && tradeTransInfoRecord.getType().equals(TradeTransactionType.OPEN)) {
+            this.syncListener.setCommand("buy");
+          } else if (
+              tradeTransInfoRecord.getCmd().equals(TradeOperationCode.SELL)
+              && tradeTransInfoRecord.getType().equals(TradeTransactionType.OPEN)) {
+            this.syncListener.setCommand("sell");
+          } else if (
+              tradeTransInfoRecord.getCmd().equals(TradeOperationCode.BUY)
+              && tradeTransInfoRecord.getType().equals(TradeTransactionType.CLOSE)) {
+            this.syncListener.setCommand("closeBuy");
+          } else if (
+              tradeTransInfoRecord.getCmd().equals(TradeOperationCode.SELL)
+              && tradeTransInfoRecord.getType().equals(TradeTransactionType.CLOSE)) {
+            this.syncListener.setCommand("closeSell");
+          }
           this.syncWebsocket.send(new TradeTransactionCommand(tradeTransInfoRecord).toJSONString());
         })
         .blockingGet();

@@ -17,6 +17,7 @@ import eu.qwsome.xapi.stream.response.LoginResponse;
 import eu.qwsome.xapi.stream.response.ResponseParser;
 import eu.qwsome.xapi.stream.response.SymbolResponse;
 import eu.qwsome.xapi.stream.response.TradeTransactionResponse;
+import eu.qwsome.xapi.stream.response.TradeTransactionStatusResponse;
 import eu.qwsome.xapi.stream.response.TradesResponse;
 
 /**
@@ -27,11 +28,12 @@ import eu.qwsome.xapi.stream.response.TradesResponse;
 @Slf4j
 public class MainWebsocketListener extends WebSocketListener {
 
-  private final SingleSubject<LoginResponse> loginSubject = SingleSubject.create();
-  private final SingleSubject<TradeTransactionResponse> tradeTransactionSubject = SingleSubject.create();
-  private final SingleSubject<AllSymbolsResponse> allSymbolsSubject = SingleSubject.create();
-  private final SingleSubject<SymbolResponse> getSymbolSubject = SingleSubject.create();
-  private final SingleSubject<TradesResponse> getTradesSubject = SingleSubject.create();
+  private SingleSubject<LoginResponse> loginSubject = SingleSubject.create();
+  private SingleSubject<TradeTransactionResponse> tradeTransactionSubject = SingleSubject.create();
+  private SingleSubject<TradeTransactionStatusResponse> tradeTransactionStatusSubject = SingleSubject.create();
+  private SingleSubject<AllSymbolsResponse> allSymbolsSubject = SingleSubject.create();
+  private SingleSubject<SymbolResponse> getSymbolSubject = SingleSubject.create();
+  private SingleSubject<TradesResponse> getTradesSubject = SingleSubject.create();
 
   private final LinkedBlockingDeque<String> command = new LinkedBlockingDeque<>(1);
 
@@ -58,7 +60,12 @@ public class MainWebsocketListener extends WebSocketListener {
       final var lastCommand = this.command.pop();
       if ("login".equals(lastCommand)) {
         this.loginSubject.onSuccess(new ResponseParser().parseLogin(text));
-      } else if ("buy".equals(lastCommand) || "closeBuy".equals(lastCommand)) {
+      } else if (
+          "buy".equals(lastCommand)
+          || "sell".equals(lastCommand)
+          || "closeBuy".equals(lastCommand)
+          || "closeSell".equals(lastCommand)
+      ) {
         this.tradeTransactionSubject.onSuccess(new ResponseParser().parseTradeTransaction(text));
       } else if ("allSymbols".equals(lastCommand)) {
         this.allSymbolsSubject.onSuccess(new ResponseParser().parseAllSymbols(text));
@@ -66,6 +73,8 @@ public class MainWebsocketListener extends WebSocketListener {
         this.getSymbolSubject.onSuccess(new ResponseParser().parseGetSymbol(text));
       } else if ("getTrades".equals(lastCommand)) {
         this.getTradesSubject.onSuccess((new ResponseParser().parseGetTrades(text)));
+      } else if ("transactionStatus".equals(lastCommand)) {
+        this.tradeTransactionStatusSubject.onSuccess(new ResponseParser().parseTradeTransactionStatus(text));
       }
     } catch (final Exception e) {
       onFailure(webSocket, e, null);
@@ -83,26 +92,37 @@ public class MainWebsocketListener extends WebSocketListener {
 
 
   public Single<LoginResponse> createLoginStream() {
+    loginSubject = SingleSubject.create();
     return this.loginSubject.subscribeOn(Schedulers.io());
   }
 
 
   public Single<TradeTransactionResponse> createTradeTransactionStream() {
+    this.tradeTransactionSubject = SingleSubject.create();
     return this.tradeTransactionSubject.subscribeOn(Schedulers.io());
   }
 
 
+  public Single<TradeTransactionStatusResponse> createTradeTransactionStatusStream() {
+    this.tradeTransactionStatusSubject = SingleSubject.create();
+    return this.tradeTransactionStatusSubject.subscribeOn(Schedulers.io());
+  }
+
+
   public Single<AllSymbolsResponse> createAllSymbolsStream() {
+    this.allSymbolsSubject = SingleSubject.create();
     return this.allSymbolsSubject.subscribeOn(Schedulers.io());
   }
 
 
   public Single<SymbolResponse> createGetSymbolStream() {
+    this.getSymbolSubject = SingleSubject.create();
     return this.getSymbolSubject.subscribeOn(Schedulers.io());
   }
 
 
   public Single<TradesResponse> createGetTradesStream() {
+    this.getTradesSubject = SingleSubject.create();
     return this.getTradesSubject.subscribeOn(Schedulers.io());
   }
 }

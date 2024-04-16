@@ -1,10 +1,14 @@
 package eu.qwsome.xapi.stream.response;
 
 
+import lombok.Getter;
+import lombok.ToString;
 import org.json.JSONObject;
 
 import eu.qwsome.xapi.stream.codes.RequestStatus;
 
+@Getter
+@ToString
 public class TradeTransactionStatusResponse extends BaseResponse {
 
   private Double ask;
@@ -20,51 +24,12 @@ public class TradeTransactionStatusResponse extends BaseResponse {
 
     final var ob = (JSONObject) this.getReturnData();
     if (getStatus()) {
-      this.ask = Double.valueOf(ob.get("ask").toString());
-      this.bid = Double.valueOf(ob.get("bid").toString());
+      this.ask = ob.getDouble("ask");
+      this.bid = ob.getDouble("bid");
       this.order = ob.getLong("order");
-      this.message = ob.getString("message");
-      this.customComment = ob.getString("customComment");
+      this.message = ob.optString("message");
+      this.customComment = ob.optString("customComment");
       this.requestStatus = new RequestStatus(ob.getLong("requestStatus"));
     }
-  }
-
-
-  public Double getAsk() {
-    return this.ask;
-  }
-
-
-  public String getMessage() {
-    return this.message;
-  }
-
-
-  public Double getBid() {
-    return this.bid;
-  }
-
-
-  public Long getOrder() {
-    return this.order;
-  }
-
-
-  public RequestStatus getRequestStatus() {
-    return this.requestStatus;
-  }
-
-
-  public String getCustomComment() {
-    return this.customComment;
-  }
-
-
-  @Override
-  public String toString() {
-    return "TradeTransactionStatusResponse [ask=" + this.ask + ", bid=" + this.bid
-           + ", message=" + this.message + ", order=" + this.order
-           + ", requestStatus=" + this.requestStatus + ", customComment="
-           + this.customComment + "]";
   }
 }

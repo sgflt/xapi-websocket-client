@@ -74,4 +74,9 @@ public class ResponseParser {
   public TradesResponse parseGetTrades(final String text) {
     return new TradesResponse(text);
   }
+
+
+  public TradeTransactionStatusResponse parseTradeTransactionStatus(final String text) {
+    return new TradeTransactionStatusResponse(text);
+  }
 }
