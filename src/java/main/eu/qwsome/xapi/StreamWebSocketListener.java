@@ -42,6 +42,7 @@ public class StreamWebSocketListener extends WebSocketListener {
     this.newsSubject.onComplete();
     this.candleSubject.onComplete();
     this.keepAliveSubject.onComplete();
+    this.profitsSubject.onComplete();
   }
 
 
@@ -60,6 +61,7 @@ public class StreamWebSocketListener extends WebSocketListener {
     this.newsSubject.onError(t);
     this.candleSubject.onError(t);
     this.keepAliveSubject.onError(t);
+    this.profitsSubject.onError(t);
   }
 
 
@@ -90,6 +92,8 @@ public class StreamWebSocketListener extends WebSocketListener {
           this.candleSubject.onNext(candleRecord);
         } else if (brr instanceof final SKeepAliveRecord keepAliveRecord) {
           this.keepAliveSubject.onNext(keepAliveRecord);
+        } else if (brr instanceof final SProfitRecord profitRecord) {
+          this.profitsSubject.onNext(profitRecord);
         }
       }
     }
