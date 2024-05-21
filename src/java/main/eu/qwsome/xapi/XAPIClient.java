@@ -23,6 +23,7 @@
 package eu.qwsome.xapi;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 import io.github.bucket4j.BlockingBucket;
@@ -38,8 +39,10 @@ import okhttp3.Request;
 import okhttp3.WebSocket;
 import org.jetbrains.annotations.NotNull;
 
+import eu.qwsome.xapi.stream.codes.PeriodCode;
 import eu.qwsome.xapi.stream.codes.TradeOperationCode;
 import eu.qwsome.xapi.stream.codes.TradeTransactionType;
+import eu.qwsome.xapi.stream.records.request.ChartLastInfoRecord;
 import eu.qwsome.xapi.stream.records.request.TradeTransInfoRecord;
 import eu.qwsome.xapi.stream.records.response.SBalanceRecord;
 import eu.qwsome.xapi.stream.records.response.SCandleRecord;
@@ -50,6 +53,7 @@ import eu.qwsome.xapi.stream.records.response.STickRecord;
 import eu.qwsome.xapi.stream.records.response.STradeRecord;
 import eu.qwsome.xapi.stream.records.response.STradeStatusRecord;
 import eu.qwsome.xapi.stream.response.AllSymbolsResponse;
+import eu.qwsome.xapi.stream.response.ChartResponse;
 import eu.qwsome.xapi.stream.response.LoginResponse;
 import eu.qwsome.xapi.stream.response.SymbolResponse;
 import eu.qwsome.xapi.stream.response.TradeTransactionResponse;
@@ -74,6 +78,7 @@ import eu.qwsome.xapi.stream.subscription.TradeStatusRecordsStop;
 import eu.qwsome.xapi.stream.subscription.TradeStatusRecordsSubscribe;
 import eu.qwsome.xapi.sync.Credentials;
 import eu.qwsome.xapi.sync.command.AllSymbolsCommand;
+import eu.qwsome.xapi.sync.command.ChartLastCommand;
 import eu.qwsome.xapi.sync.command.LoginCommand;
 import eu.qwsome.xapi.sync.command.SymbolCommand;
 import eu.qwsome.xapi.sync.command.TradeTransactionCommand;
@@ -202,6 +207,25 @@ public class XAPIClient {
     this.bucket.consumeUninterruptibly(1);
 
     return getTrades(false);
+  }
+
+
+  public ChartResponse getChartLastRequest(final String symbol, final Instant start, final PeriodCode period) {
+    log.trace("getChartLastRequest(symbol={}, start={}, period={})", symbol, start, period);
+
+    this.bucket.consumeUninterruptibly(1);
+
+    return this.syncListener.createGetChartLastRequestStream()
+        .doOnSubscribe(disposable -> {
+          this.syncListener.setCommand("getChartLastRequest");
+          this.syncWebsocket.send(new ChartLastCommand(
+              ChartLastInfoRecord.builder()
+                  .symbol(symbol)
+                  .start(start.toEpochMilli())
+                  .period(period)
+                  .build()
+          ).toJSONString());
+        }).blockingGet();
   }
 
 

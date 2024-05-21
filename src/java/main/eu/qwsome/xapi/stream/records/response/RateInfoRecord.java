@@ -39,10 +39,6 @@ public class RateInfoRecord implements BaseResponseRecord {
   private double vol;
 
 
-  public RateInfoRecord() {
-  }
-
-
   public void setCtm(final long ctm) {
     this.ctm = ctm;
   }
@@ -75,12 +71,11 @@ public class RateInfoRecord implements BaseResponseRecord {
 
   @Override
   public void setFieldsFromJSONObject(final JSONObject e) {
-    // TODO
-    this.setClose((Double) e.get("close"));
-    this.setCtm((Long) e.get("ctm"));
-    this.setHigh((Double) e.get("high"));
-    this.setLow((Double) e.get("low"));
-    this.setOpen((Double) e.get("open"));
-    this.setVol((Double) e.get("vol"));
+    this.setClose(e.getDouble("close"));
+    this.setCtm(e.getLong("ctm"));
+    this.setHigh(e.getDouble("high"));
+    this.setLow(e.getDouble("low"));
+    this.setOpen(e.getDouble("open"));
+    this.setVol(e.getDouble("vol"));
   }
 }

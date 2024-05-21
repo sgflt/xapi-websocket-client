@@ -98,6 +98,11 @@ public class ResponseParser {
   }
 
 
+  public ChartResponse parseGetChartLastRequest(final String text) {
+    return new ChartResponse(text);
+  }
+
+
   public TradeTransactionStatusResponse parseTradeTransactionStatus(final String text) {
     return new TradeTransactionStatusResponse(text);
   }

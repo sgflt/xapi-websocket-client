@@ -22,11 +22,13 @@
  */
 package eu.qwsome.xapi.stream.records.request;
 
+import lombok.Builder;
 import lombok.Data;
 import org.json.JSONObject;
 
 import eu.qwsome.xapi.stream.codes.PeriodCode;
 
+@Builder
 @Data
 public class ChartLastInfoRecord {
 

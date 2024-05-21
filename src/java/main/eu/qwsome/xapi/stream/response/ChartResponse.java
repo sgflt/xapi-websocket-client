@@ -28,7 +28,6 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.ToString;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.qwsome.xapi.stream.records.response.RateInfoRecord;
@@ -46,13 +45,13 @@ public class ChartResponse extends BaseResponse {
 
     final var rd = (JSONObject) this.getReturnData();
     this.rateInfos = new ArrayList<>(rd.length());
-    this.digits = ((Long) rd.get("digits")).intValue();
-    final var arr = (JSONArray) rd.get("rateInfos");
-    for (final Object o : arr) {
+    this.digits = rd.getInt("digits");
+    final var arr = rd.getJSONArray("rateInfos");
+    for (final var o : arr) {
       final var e = (JSONObject) o;
-      final var record = new RateInfoRecord();
-      record.setFieldsFromJSONObject(e);
-      this.rateInfos.add(record);
+      final var rateInfo = new RateInfoRecord();
+      rateInfo.setFieldsFromJSONObject(e);
+      this.rateInfos.add(rateInfo);
     }
   }
 }

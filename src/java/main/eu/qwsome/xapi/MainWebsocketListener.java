@@ -35,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import eu.qwsome.xapi.stream.response.AllSymbolsResponse;
+import eu.qwsome.xapi.stream.response.ChartResponse;
 import eu.qwsome.xapi.stream.response.LoginResponse;
 import eu.qwsome.xapi.stream.response.ResponseParser;
 import eu.qwsome.xapi.stream.response.SymbolResponse;
@@ -56,6 +57,7 @@ public class MainWebsocketListener extends WebSocketListener {
   private SingleSubject<AllSymbolsResponse> allSymbolsSubject = SingleSubject.create();
   private SingleSubject<SymbolResponse> getSymbolSubject = SingleSubject.create();
   private SingleSubject<TradesResponse> getTradesSubject = SingleSubject.create();
+  private SingleSubject<ChartResponse> getChartLastRequestSubject = SingleSubject.create();
 
   private final LinkedBlockingDeque<String> command = new LinkedBlockingDeque<>(1);
 
@@ -71,6 +73,7 @@ public class MainWebsocketListener extends WebSocketListener {
     this.tradeTransactionSubject.onError(t);
     this.getSymbolSubject.onError(t);
     this.getTradesSubject.onError(t);
+    this.getChartLastRequestSubject.onError(t);
   }
 
 
@@ -97,6 +100,8 @@ public class MainWebsocketListener extends WebSocketListener {
         this.getTradesSubject.onSuccess((new ResponseParser().parseGetTrades(text)));
       } else if ("transactionStatus".equals(lastCommand)) {
         this.tradeTransactionStatusSubject.onSuccess(new ResponseParser().parseTradeTransactionStatus(text));
+      } else if ("getChartLastRequest".equals(lastCommand)) {
+        this.getChartLastRequestSubject.onSuccess(new ResponseParser().parseGetChartLastRequest(text));
       }
     } catch (final Exception e) {
       onFailure(webSocket, e, null);
@@ -114,7 +119,7 @@ public class MainWebsocketListener extends WebSocketListener {
 
 
   public Single<LoginResponse> createLoginStream() {
-    loginSubject = SingleSubject.create();
+    this.loginSubject = SingleSubject.create();
     return this.loginSubject.subscribeOn(Schedulers.io());
   }
 
@@ -146,5 +151,11 @@ public class MainWebsocketListener extends WebSocketListener {
   public Single<TradesResponse> createGetTradesStream() {
     this.getTradesSubject = SingleSubject.create();
     return this.getTradesSubject.subscribeOn(Schedulers.io());
+  }
+
+
+  public Single<ChartResponse> createGetChartLastRequestStream() {
+    this.getChartLastRequestSubject = SingleSubject.create();
+    return this.getChartLastRequestSubject.subscribeOn(Schedulers.io());
   }
 }
