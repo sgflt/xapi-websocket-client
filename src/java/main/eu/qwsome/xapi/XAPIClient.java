@@ -610,12 +610,32 @@ public class XAPIClient {
 
 
   /**
-   * Subscribes for chart candles of a chosen symbol
+   * Subscribes for chart candles of a chosen symbol.
+   * <p>
+   * Stream may receive candles from another subscribed assets.
+   *
+   * @see #subscribeCandle(String)
    */
   public Observable<SCandleRecord> createCandleStream(final String symbol) {
     log.trace("createCandleStream(symbol={})", symbol);
 
     this.streamBucket.consumeUninterruptibly(1);
+
+    if (symbol != null) {
+      subscribeCandle(symbol);
+    }
+
+    return this.streamWebSocketListener.createCandleStream();
+  }
+
+
+  /**
+   * Requests streamed data for symbol.
+   *
+   * @param symbol to receive
+   */
+  public void subscribeCandle(final String symbol) {
+    log.trace("subscribeCandleStream(symbol={})", symbol);
 
     this.streamWebsocket.send(
         CandlesSubscribe.builder()
@@ -624,8 +644,6 @@ public class XAPIClient {
             .build()
             .toJSONString()
     );
-
-    return this.streamWebSocketListener.createCandleStream();
   }
 
 
