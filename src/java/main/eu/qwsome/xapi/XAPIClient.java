@@ -97,13 +97,7 @@ public class XAPIClient {
 
   private final BlockingBucket bucket = Bucket.builder()
       .withSynchronizationStrategy(SynchronizationStrategy.SYNCHRONIZED)
-      .addLimit(limit -> limit.capacity(6).refillIntervally(1, Duration.ofMillis(250)))
-      .build().asBlocking();
-
-
-  private final BlockingBucket streamBucket = Bucket.builder()
-      .withSynchronizationStrategy(SynchronizationStrategy.SYNCHRONIZED)
-      .addLimit(limit -> limit.capacity(6).refillIntervally(1, Duration.ofMillis(250)))
+      .addLimit(limit -> limit.capacity(5).refillIntervally(1, Duration.ofMillis(250)))
       .build().asBlocking();
 
   private final String symbol;
@@ -359,7 +353,7 @@ public class XAPIClient {
   public Observable<STickRecord> createPriceStream() {
     log.trace("createPriceStream()");
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         TickPricesSubscribe.builder()
@@ -379,7 +373,7 @@ public class XAPIClient {
   public Observable<STickRecord> createPriceStream(final int minArrivalTime) {
     log.trace("createPriceStream(minArrivalTime={})", minArrivalTime);
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         TickPricesSubscribe.builder()
@@ -403,7 +397,7 @@ public class XAPIClient {
   ) {
     log.trace("createPriceStream(minArrivalTime={}, maxLevel={})", minArrivalTime, maxLevel);
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         TickPricesSubscribe.builder()
@@ -427,7 +421,7 @@ public class XAPIClient {
   ) {
     log.trace("createPriceStreamMaxLevel(maxLevel={})", maxLevel);
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         TickPricesSubscribe.builder()
@@ -448,7 +442,7 @@ public class XAPIClient {
   public void unsubscribePrice() {
     log.trace("unsubscribePrice()");
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         TickPricesStop.builder()
@@ -467,7 +461,7 @@ public class XAPIClient {
   public Observable<STradeRecord> createTradesStream() {
     log.trace("createTradesStream()");
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         TradeRecordsSubscribe.builder()
@@ -486,7 +480,7 @@ public class XAPIClient {
   public void unsubscribeTrades() {
     log.trace("unsubscribeTrades()");
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         TradeRecordsStop.builder()
@@ -504,7 +498,7 @@ public class XAPIClient {
   public Observable<SNewsRecord> createNewsStream() {
     log.trace("createNewsStream()");
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(NewsSubscribe.builder().streamSessionId(this.sessionId).build().toJSONString());
 
@@ -518,7 +512,7 @@ public class XAPIClient {
   public void unsubscribeNews() {
     log.trace("unsubscribeNews()");
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         NewsStop.builder()
@@ -536,7 +530,7 @@ public class XAPIClient {
   public Observable<SProfitRecord> createProfitsStream() {
     log.trace("createProfitsStream()");
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         ProfitsSubscribe.builder()
@@ -555,7 +549,7 @@ public class XAPIClient {
   public void unsubscribeProfits() {
     log.trace("unsubscribeProfits()");
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         ProfitsStop.builder()
@@ -573,7 +567,7 @@ public class XAPIClient {
   public Observable<SBalanceRecord> createBalanceStream() {
     log.trace("createBalanceStream()");
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         BalanceSubscribe.builder()
@@ -592,7 +586,7 @@ public class XAPIClient {
   public void unsubscribeBalance() {
     log.trace("unsubscribeBalance()");
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         BalanceStop.builder()
@@ -619,7 +613,7 @@ public class XAPIClient {
   public Observable<SCandleRecord> createCandleStream(final String symbol) {
     log.trace("createCandleStream(symbol={})", symbol);
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     if (symbol != null) {
       subscribeCandle(symbol);
@@ -658,7 +652,7 @@ public class XAPIClient {
   public void unsubscribeCandle(final String symbol) {
     log.trace("unsubscribeCandle(symbol={})", symbol);
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         CandlesStop.builder()
@@ -677,7 +671,7 @@ public class XAPIClient {
   public Observable<SKeepAliveRecord> createKeepAliveStream() {
     log.trace("createKeepAliveStream()");
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         KeepAliveSubscribe.builder()
@@ -696,7 +690,7 @@ public class XAPIClient {
   public void unsubscribeKeepAlive() {
     log.trace("unsubscribeKeepAlive()");
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         KeepAliveStop.builder()
@@ -714,7 +708,7 @@ public class XAPIClient {
   public Observable<STradeStatusRecord> createTradesStatusStream() {
     log.trace("createTradesStatusStream()");
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         TradeStatusRecordsSubscribe.builder()
@@ -733,7 +727,7 @@ public class XAPIClient {
   public void unsubscribeTradeStatus() {
     log.trace("unsubscribeTradeStatus()");
 
-    this.streamBucket.consumeUninterruptibly(1);
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         TradeStatusRecordsStop.builder()
