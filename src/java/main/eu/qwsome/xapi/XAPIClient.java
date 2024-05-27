@@ -85,6 +85,9 @@ import eu.qwsome.xapi.sync.command.TradeTransactionCommand;
 import eu.qwsome.xapi.sync.command.TradeTransactionStatusCommand;
 import eu.qwsome.xapi.sync.command.TradesCommand;
 
+/**
+ * Client that is usable for single symbol trading
+ */
 @Slf4j
 public class XAPIClient {
 
@@ -180,14 +183,19 @@ public class XAPIClient {
 
 
   public SymbolResponse getSymbol() {
-    log.trace("getSymbol()");
+    return getSymbol(this.symbol);
+  }
+
+
+  public SymbolResponse getSymbol(final String symbol) {
+    log.trace("getSymbol(symbol={})", symbol);
 
     this.bucket.consumeUninterruptibly(1);
 
     return this.syncListener.createGetSymbolStream()
         .doOnSubscribe(disposable -> {
           this.syncListener.setCommand("getSymbol");
-          this.syncWebsocket.send(new SymbolCommand(this.symbol).toJSONString());
+          this.syncWebsocket.send(new SymbolCommand(symbol).toJSONString());
         }).blockingGet();
   }
 
@@ -207,6 +215,11 @@ public class XAPIClient {
     this.bucket.consumeUninterruptibly(1);
 
     return getTrades(false);
+  }
+
+
+  public ChartResponse getChartLastRequest(final Instant start, final PeriodCode period) {
+    return getChartLastRequest(this.symbol, start, period);
   }
 
 
@@ -591,17 +604,22 @@ public class XAPIClient {
   }
 
 
+  public Observable<SCandleRecord> createCandleStream() {
+    return createCandleStream(this.symbol);
+  }
+
+
   /**
    * Subscribes for chart candles of a chosen symbol
    */
-  public Observable<SCandleRecord> createCandleStream() {
-    log.trace("createCandleStream()");
+  public Observable<SCandleRecord> createCandleStream(final String symbol) {
+    log.trace("createCandleStream(symbol={})", symbol);
 
     this.streamBucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         CandlesSubscribe.builder()
-            .symbol(this.symbol)
+            .symbol(symbol)
             .streamSessionId(this.sessionId)
             .build()
             .toJSONString()
@@ -611,17 +629,22 @@ public class XAPIClient {
   }
 
 
+  public void unsubscribeCandle() {
+    unsubscribeCandle(this.symbol);
+  }
+
+
   /**
    * Unsubscribes chart candles of a symbol
    */
-  public void unsubscribeCandle() {
-    log.trace("unsubscribeCandle()");
+  public void unsubscribeCandle(final String symbol) {
+    log.trace("unsubscribeCandle(symbol={})", symbol);
 
     this.streamBucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         CandlesStop.builder()
-            .symbol(this.symbol)
+            .symbol(symbol)
             .build()
             .toJSONString()
     );
