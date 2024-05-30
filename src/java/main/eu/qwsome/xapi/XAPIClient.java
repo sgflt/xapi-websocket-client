@@ -613,8 +613,6 @@ public class XAPIClient {
   public Observable<SCandleRecord> createCandleStream(final String symbol) {
     log.trace("createCandleStream(symbol={})", symbol);
 
-    this.bucket.consumeUninterruptibly(1);
-
     if (symbol != null) {
       subscribeCandle(symbol);
     }
@@ -630,6 +628,8 @@ public class XAPIClient {
    */
   public void subscribeCandle(final String symbol) {
     log.trace("subscribeCandleStream(symbol={})", symbol);
+
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         CandlesSubscribe.builder()
