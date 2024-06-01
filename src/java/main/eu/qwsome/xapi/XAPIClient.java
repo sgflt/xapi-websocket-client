@@ -80,6 +80,7 @@ import eu.qwsome.xapi.sync.Credentials;
 import eu.qwsome.xapi.sync.command.AllSymbolsCommand;
 import eu.qwsome.xapi.sync.command.ChartLastCommand;
 import eu.qwsome.xapi.sync.command.LoginCommand;
+import eu.qwsome.xapi.sync.command.PingCommand;
 import eu.qwsome.xapi.sync.command.SymbolCommand;
 import eu.qwsome.xapi.sync.command.TradeTransactionCommand;
 import eu.qwsome.xapi.sync.command.TradeTransactionStatusCommand;
@@ -91,9 +92,7 @@ import eu.qwsome.xapi.sync.command.TradesCommand;
 @Slf4j
 public class XAPIClient {
 
-  private final OkHttpClient client = new OkHttpClient.Builder()
-      .pingInterval(Duration.ofSeconds(30))
-      .build();
+  private final OkHttpClient client = new OkHttpClient.Builder().build();
 
   private final BlockingBucket bucket = Bucket.builder()
       .withSynchronizationStrategy(SynchronizationStrategy.SYNCHRONIZED)
@@ -127,10 +126,16 @@ public class XAPIClient {
   }
 
 
-  private void keepAlive(final Long minute) {
-    log.trace("keepAlive(minute={})", minute);
+  private void keepAlive(final Long iteration) {
+    log.trace("keepAlive(iteration={})", iteration);
 
-    this.streamWebsocket.send(StreamPingCommand.builder().streamSessionId(this.sessionId).build().toJSONString());
+    this.syncWebsocket.send(new PingCommand().toJSONString());
+
+    this.streamWebsocket.send(
+        StreamPingCommand.builder()
+            .streamSessionId(this.sessionId)
+            .build().toJSONString()
+    );
   }
 
 
@@ -144,8 +149,8 @@ public class XAPIClient {
         }).doOnSuccess(loginResponse -> {
           connectStream(loginResponse.getStreamSessionId());
 
-          Observable.interval(10, TimeUnit.MINUTES)
-              .subscribe(this::keepAlive);
+          Observable.interval(30, TimeUnit.SECONDS)
+              .subscribe(this::keepAlive, throwable -> log.error("keep alive failed", throwable));
         })
         ;
   }
