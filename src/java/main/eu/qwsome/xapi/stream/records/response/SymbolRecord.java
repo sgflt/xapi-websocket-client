@@ -23,7 +23,10 @@
 package eu.qwsome.xapi.stream.records.response;
 
 
+import java.time.Instant;
+
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.json.JSONObject;
 
@@ -33,6 +36,7 @@ import eu.qwsome.xapi.stream.codes.SwapRolloverType;
 import eu.qwsome.xapi.stream.codes.SwapType;
 
 @Getter
+@Setter
 @ToString
 public class SymbolRecord implements BaseResponseRecord {
 
@@ -45,13 +49,13 @@ public class SymbolRecord implements BaseResponseRecord {
   private double high;
   private double low;
   private String symbol;
-  private long time;
+  private Instant time;
   private int type;
   private String groupName;
   private String categoryName;
   private boolean longOnly;
-  private Long starting;
-  private Long expiration;
+  private Instant starting;
+  private Instant expiration;
   private int stepRuleId;
   private int stopsLevel;
   private double lotMax;
@@ -69,6 +73,7 @@ public class SymbolRecord implements BaseResponseRecord {
   private double spreadRaw;
   private double spreadTable;
   private boolean swapEnable;
+  private boolean shortSelling;
   private double swapLong;
   private double swapShort;
   private SwapType swapType;
@@ -79,6 +84,7 @@ public class SymbolRecord implements BaseResponseRecord {
   private String timeString;
   private double leverage;
   private boolean currencyPair;
+  private boolean trailingEnabled;
 
 
   @Override
@@ -89,7 +95,8 @@ public class SymbolRecord implements BaseResponseRecord {
       this.setCategoryName(e.getString("categoryName"));
       this.setCurrency(e.getString("currency"));
       this.setDescription(e.getString("description"));
-      this.setExpiration(e.optLongObject("expiration", null));
+      final var expirationMillis = e.optLongObject("expiration", null);
+      this.setExpiration(expirationMillis == null ? null : Instant.ofEpochMilli(expirationMillis));
       this.setGroupName(e.getString("groupName"));
       this.setHigh(e.getDouble("high"));
       this.setInstantMaxVolume(e.getInt("instantMaxVolume"));
@@ -99,12 +106,14 @@ public class SymbolRecord implements BaseResponseRecord {
       this.setLow(e.getDouble("low"));
       this.setPrecision(e.getInt("precision"));
       this.setStepRuleId(e.getInt("stepRuleId"));
-      this.setStarting(e.optLongObject("starting", null));
+      final var startingMillis = e.optLongObject("starting", null);
+      this.setStarting(startingMillis == null ? null : Instant.ofEpochMilli(startingMillis));
       this.setStopsLevel(e.getInt("stopsLevel"));
       this.setSymbol(e.getString("symbol"));
       this.setQuoteId(e.getInt("quoteId"));
       this.setCurrencyProfit(e.getString("currencyProfit"));
-      this.setTime(e.getLong("time"));
+      final var timeMillis = e.getLong("time");
+      this.setTime(Instant.ofEpochMilli(timeMillis));
       this.setTimeString(e.getString("timeString"));
       this.setType(e.getInt("type"));
 
@@ -116,7 +125,7 @@ public class SymbolRecord implements BaseResponseRecord {
       }
       this.setLotStep(e.getDouble("lotStep"));
       if (e.has("marginHedged")) {
-        this.setMarginHedged(Double.valueOf(e.get("marginHedged").toString()));
+        this.setMarginHedged(e.getDouble("marginHedged"));
       }
       this.setMarginHedgedStrong((Boolean) e.get("marginHedgedStrong"));
       if (e.has("marginMaintenance")) {
@@ -125,7 +134,8 @@ public class SymbolRecord implements BaseResponseRecord {
       this.setMarginMode(new MarginMode(e.getInt("marginMode")));
       this.setPercentage(e.getDouble("percentage"));
       this.setProfitMode(new ProfitMode(e.getInt("profitMode")));
-      this.setSwapEnable((Boolean) e.get("swapEnable"));
+      this.setShortSelling(e.getBoolean("shortSelling"));
+      this.setSwapEnable(e.getBoolean("swapEnable"));
       this.setSwapLong(e.getDouble("swapLong"));
       this.setSwapShort(e.getDouble("swapShort"));
       this.setSwapType(new SwapType(e.getInt("swapType")));
@@ -136,206 +146,7 @@ public class SymbolRecord implements BaseResponseRecord {
       this.leverage = e.getDouble("leverage");
       this.spreadRaw = e.getDouble("spreadRaw");
       this.spreadTable = e.getDouble("spreadTable");
+      this.trailingEnabled = e.getBoolean("trailingEnabled");
     }
-  }
-
-
-  public void setTimeString(final String timeString) {
-    this.timeString = timeString;
-  }
-
-
-  public void setCurrencyProfit(final String currencyProfit) {
-    this.currencyProfit = currencyProfit;
-  }
-
-
-  public void setQuoteId(final int quoteId) {
-    this.quoteId = quoteId;
-  }
-
-
-  public void setAsk(final Double ask) {
-    this.ask = ask;
-  }
-
-
-  public void setBid(final Double bid) {
-    this.bid = bid;
-  }
-
-
-  public void setCurrency(final String currency) {
-    this.currency = currency;
-  }
-
-
-  public void setDescription(final String description) {
-    this.description = description;
-  }
-
-
-  public void setInstantMaxVolume(final int instantMaxVolume) {
-    this.instantMaxVolume = instantMaxVolume;
-  }
-
-
-  public void setHigh(final Double high) {
-    this.high = high;
-  }
-
-
-  public void setLow(final Double low) {
-    this.low = low;
-  }
-
-
-  public String getSymbol() {
-    return this.symbol;
-  }
-
-
-  public void setSymbol(final String symbol) {
-    this.symbol = symbol;
-  }
-
-
-  public void setTime(final Long time) {
-    this.time = time;
-  }
-
-
-  public void setType(final int type) {
-    this.type = type;
-  }
-
-
-  public void setGroupName(final String groupName) {
-    this.groupName = groupName;
-  }
-
-
-  public void setCategoryName(final String categoryName) {
-    this.categoryName = categoryName;
-  }
-
-
-  public void setLongOnly(final boolean longOnly) {
-    this.longOnly = longOnly;
-  }
-
-
-  public void setStarting(final Long starting) {
-    this.starting = starting;
-  }
-
-
-  public void setExpiration(final Long expiration) {
-    this.expiration = expiration;
-  }
-
-
-  public void setStopsLevel(final int stopsLevel) {
-    this.stopsLevel = stopsLevel;
-  }
-
-
-  public void setLotMax(final Double lotMax) {
-    this.lotMax = lotMax;
-  }
-
-
-  public void setLotMin(final Double lotMin) {
-    this.lotMin = lotMin;
-  }
-
-
-  public void setPrecision(final int precision) {
-    this.precision = precision;
-  }
-
-
-  public void setContractSize(final Long contractSize) {
-    this.contractSize = contractSize;
-  }
-
-
-  public void setInitialMargin(final Long initialMargin) {
-    this.initialMargin = initialMargin;
-  }
-
-
-  public void setLotStep(final Double lotStep) {
-    this.lotStep = lotStep;
-  }
-
-
-  public void setMarginHedged(final Double marginHedged) {
-    this.marginHedged = marginHedged;
-  }
-
-
-  public void setMarginHedgedStrong(final Boolean marginHedgedStrong) {
-    this.marginHedgedStrong = marginHedgedStrong;
-  }
-
-
-  public void setMarginMaintenance(final Long marginMaintenance) {
-    this.marginMaintenance = marginMaintenance;
-  }
-
-
-  public void setMarginMode(final MarginMode marginMode) {
-    this.marginMode = marginMode;
-  }
-
-
-  public void setPercentage(final Double percentage) {
-    this.percentage = percentage;
-  }
-
-
-  public void setProfitMode(final ProfitMode profitMode) {
-    this.profitMode = profitMode;
-  }
-
-
-  public void setSwapEnable(final boolean swapEnable) {
-    this.swapEnable = swapEnable;
-  }
-
-
-  public void setSwapLong(final Double swapLong) {
-    this.swapLong = swapLong;
-  }
-
-
-  public void setSwapShort(final Double swapShort) {
-    this.swapShort = swapShort;
-  }
-
-
-  public void setSwapType(final SwapType swapType) {
-    this.swapType = swapType;
-  }
-
-
-  public void setSwapRollover(final SwapRolloverType swap_rollover) {
-    this.swapRollover = swap_rollover;
-  }
-
-
-  public void setTickSize(final double tickSize) {
-    this.tickSize = tickSize;
-  }
-
-
-  public void setTickValue(final double tickValue) {
-    this.tickValue = tickValue;
-  }
-
-
-  public void setStepRuleId(final int stepRuleId) {
-    this.stepRuleId = stepRuleId;
   }
 }
