@@ -129,7 +129,12 @@ public class XAPIClient {
   private void keepAlive(final Long iteration) {
     log.trace("keepAlive(iteration={})", iteration);
 
+    this.bucket.consumeUninterruptibly(1);
+
+    this.syncListener.setCommand("ping");
     this.syncWebsocket.send(new PingCommand().toJSONString());
+
+    this.bucket.consumeUninterruptibly(1);
 
     this.streamWebsocket.send(
         StreamPingCommand.builder()
@@ -158,6 +163,8 @@ public class XAPIClient {
 
   private void connectStream(final String sessionId) {
     log.trace("connectStream(sessionId={})", sessionId);
+
+    this.bucket.consumeUninterruptibly(1);
 
     this.sessionId = sessionId;
     final var request = new Request.Builder()
