@@ -110,6 +110,8 @@ public class MainWebsocketListener extends WebSocketListener {
 
 
   public void setCommand(final String command) {
+    log.trace("setCommand {}", command);
+
     try {
       this.command.put(command);
     } catch (final InterruptedException e) {
