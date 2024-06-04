@@ -115,6 +115,7 @@ public class MainWebsocketListener extends WebSocketListener {
     try {
       this.command.put(command);
     } catch (final InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
