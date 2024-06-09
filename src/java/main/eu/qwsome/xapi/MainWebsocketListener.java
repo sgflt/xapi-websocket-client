@@ -123,42 +123,42 @@ public class MainWebsocketListener extends WebSocketListener {
 
   public Single<LoginResponse> createLoginStream() {
     this.loginSubject = SingleSubject.create();
-    return this.loginSubject.subscribeOn(Schedulers.io());
+    return this.loginSubject.observeOn(Schedulers.io());
   }
 
 
   public Single<TradeTransactionResponse> createTradeTransactionStream() {
     this.tradeTransactionSubject = SingleSubject.create();
-    return this.tradeTransactionSubject.subscribeOn(Schedulers.io());
+    return this.tradeTransactionSubject.observeOn(Schedulers.io());
   }
 
 
   public Single<TradeTransactionStatusResponse> createTradeTransactionStatusStream() {
     this.tradeTransactionStatusSubject = SingleSubject.create();
-    return this.tradeTransactionStatusSubject.subscribeOn(Schedulers.io());
+    return this.tradeTransactionStatusSubject.observeOn(Schedulers.io());
   }
 
 
   public Single<AllSymbolsResponse> createAllSymbolsStream() {
     this.allSymbolsSubject = SingleSubject.create();
-    return this.allSymbolsSubject.subscribeOn(Schedulers.io());
+    return this.allSymbolsSubject.observeOn(Schedulers.io());
   }
 
 
   public Single<SymbolResponse> createGetSymbolStream() {
     this.getSymbolSubject = SingleSubject.create();
-    return this.getSymbolSubject.subscribeOn(Schedulers.io());
+    return this.getSymbolSubject.observeOn(Schedulers.io());
   }
 
 
   public Single<TradesResponse> createGetTradesStream() {
     this.getTradesSubject = SingleSubject.create();
-    return this.getTradesSubject.subscribeOn(Schedulers.io());
+    return this.getTradesSubject.observeOn(Schedulers.io());
   }
 
 
   public Single<ChartResponse> createGetChartLastRequestStream() {
     this.getChartLastRequestSubject = SingleSubject.create();
-    return this.getChartLastRequestSubject.subscribeOn(Schedulers.io());
+    return this.getChartLastRequestSubject.observeOn(Schedulers.io());
   }
 }
