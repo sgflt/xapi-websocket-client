@@ -134,13 +134,9 @@ public class XAPIClient {
     this.syncListener.setCommand("ping");
     this.syncWebsocket.send(new PingCommand().toJSONString());
 
-    this.bucket.consumeUninterruptibly(1);
-
-    this.streamWebsocket.send(
-        StreamPingCommand.builder()
-            .streamSessionId(this.sessionId)
-            .build().toJSONString()
-    );
+    sendCommand(StreamPingCommand.builder()
+        .streamSessionId(this.sessionId)
+        .build().toJSONString());
   }
 
 
@@ -359,23 +355,20 @@ public class XAPIClient {
   }
 
 
+  private void sendCommand(final String json) {
+    this.bucket.consumeUninterruptibly(1);
+
+    this.streamWebsocket.send(json);
+  }
+
+
   /**
    * Subscribes for prices of a chosen symbol with the given minimum arrival time in milliseconds
    */
   public Observable<STickRecord> createPriceStream() {
     log.trace("createPriceStream()");
 
-    this.bucket.consumeUninterruptibly(1);
-
-    this.streamWebsocket.send(
-        TickPricesSubscribe.builder()
-            .symbol(this.symbol)
-            .streamSessionId(this.sessionId)
-            .build()
-            .toJSONString()
-    );
-
-    return this.streamWebSocketListener.createPriceStream();
+    return createPriceStream(this.symbol, 1000);
   }
 
 
@@ -385,18 +378,17 @@ public class XAPIClient {
   public Observable<STickRecord> createPriceStream(final int minArrivalTime) {
     log.trace("createPriceStream(minArrivalTime={})", minArrivalTime);
 
-    this.bucket.consumeUninterruptibly(1);
+    return createPriceStream(this.symbol, minArrivalTime, 0);
+  }
 
-    this.streamWebsocket.send(
-        TickPricesSubscribe.builder()
-            .symbol(this.symbol)
-            .streamSessionId(this.sessionId)
-            .minArrivalTime(minArrivalTime)
-            .build()
-            .toJSONString()
-    );
 
-    return this.streamWebSocketListener.createPriceStream();
+  /**
+   * Subscribes for prices of a chosen symbol with the given minimum arrival time in milliseconds
+   */
+  public Observable<STickRecord> createPriceStream(final String symbol, final int minArrivalTime) {
+    log.trace("createPriceStream(minArrivalTime={})", minArrivalTime);
+
+    return createPriceStream(symbol, minArrivalTime, 0);
   }
 
 
@@ -404,47 +396,46 @@ public class XAPIClient {
    * Subscribes for prices of a chosen symbol with the given minimum arrival time in milliseconds and the given maxLevel
    */
   public Observable<STickRecord> createPriceStream(
+      final String symbol,
       final int minArrivalTime,
       final int maxLevel
   ) {
     log.trace("createPriceStream(minArrivalTime={}, maxLevel={})", minArrivalTime, maxLevel);
 
-    this.bucket.consumeUninterruptibly(1);
+    if (symbol != null) {
+      subscribePriceStream(symbol, minArrivalTime, maxLevel);
+    }
 
-    this.streamWebsocket.send(
+    return this.streamWebSocketListener.createPriceStream();
+  }
+
+
+  public void subscribePriceStream(final String symbol) {
+    log.trace("subscribePriceStream(symbol={})", symbol);
+
+    subscribePriceStream(symbol, 1000);
+  }
+
+
+  public void subscribePriceStream(final String symbol, final int minArrivalTime) {
+    log.trace("subscribePriceStream(symbol={}, minArrivalTIme={})", symbol, minArrivalTime);
+
+    subscribePriceStream(symbol, minArrivalTime, 0);
+  }
+
+
+  public void subscribePriceStream(final String symbol, final int minArrivalTime, final int maxLevel) {
+    log.trace("subscribePriceStream(symbol={}, minArrivalTime={}, maxLevel={})", symbol, minArrivalTime, maxLevel);
+
+    sendCommand(
         TickPricesSubscribe.builder()
-            .symbol(this.symbol)
+            .symbol(symbol)
             .streamSessionId(this.sessionId)
             .minArrivalTime(minArrivalTime)
             .maxLevel(maxLevel)
             .build()
             .toJSONString()
     );
-
-    return this.streamWebSocketListener.createPriceStream();
-  }
-
-
-  /**
-   * Subscribes for prices of a chosen symbol with the given maxLevel
-   */
-  public Observable<STickRecord> createPriceStreamMaxLevel(
-      final int maxLevel
-  ) {
-    log.trace("createPriceStreamMaxLevel(maxLevel={})", maxLevel);
-
-    this.bucket.consumeUninterruptibly(1);
-
-    this.streamWebsocket.send(
-        TickPricesSubscribe.builder()
-            .symbol(this.symbol)
-            .streamSessionId(this.sessionId)
-            .maxLevel(maxLevel)
-            .build()
-            .toJSONString()
-    );
-
-    return this.streamWebSocketListener.createPriceStream();
   }
 
 
@@ -454,14 +445,20 @@ public class XAPIClient {
   public void unsubscribePrice() {
     log.trace("unsubscribePrice()");
 
-    this.bucket.consumeUninterruptibly(1);
+    unsubscribePrice(this.symbol);
+  }
 
-    this.streamWebsocket.send(
-        TickPricesStop.builder()
-            .symbol(this.symbol)
-            .build()
-            .toJSONString()
-    );
+
+  /**
+   * Unsubscribes prices of a symbol
+   */
+  public void unsubscribePrice(final String symbol) {
+    log.trace("unsubscribePrice()");
+
+    sendCommand(TickPricesStop.builder()
+        .symbol(symbol)
+        .build()
+        .toJSONString());
 
     this.streamWebSocketListener.unsubscribePrice();
   }
@@ -473,14 +470,12 @@ public class XAPIClient {
   public Observable<STradeRecord> createTradesStream() {
     log.trace("createTradesStream()");
 
-    this.bucket.consumeUninterruptibly(1);
-
-    this.streamWebsocket.send(
+    sendCommand(
         TradeRecordsSubscribe.builder()
             .streamSessionId(this.sessionId)
             .build()
-            .toJSONString())
-    ;
+            .toJSONString()
+    );
 
     return this.streamWebSocketListener.createTradesStream();
   }
@@ -492,9 +487,7 @@ public class XAPIClient {
   public void unsubscribeTrades() {
     log.trace("unsubscribeTrades()");
 
-    this.bucket.consumeUninterruptibly(1);
-
-    this.streamWebsocket.send(
+    sendCommand(
         TradeRecordsStop.builder()
             .build()
             .toJSONString()
@@ -510,9 +503,7 @@ public class XAPIClient {
   public Observable<SNewsRecord> createNewsStream() {
     log.trace("createNewsStream()");
 
-    this.bucket.consumeUninterruptibly(1);
-
-    this.streamWebsocket.send(NewsSubscribe.builder().streamSessionId(this.sessionId).build().toJSONString());
+    sendCommand(NewsSubscribe.builder().streamSessionId(this.sessionId).build().toJSONString());
 
     return this.streamWebSocketListener.createNewsStream();
   }
@@ -524,9 +515,7 @@ public class XAPIClient {
   public void unsubscribeNews() {
     log.trace("unsubscribeNews()");
 
-    this.bucket.consumeUninterruptibly(1);
-
-    this.streamWebsocket.send(
+    sendCommand(
         NewsStop.builder()
             .build()
             .toJSONString()
@@ -542,9 +531,7 @@ public class XAPIClient {
   public Observable<SProfitRecord> createProfitsStream() {
     log.trace("createProfitsStream()");
 
-    this.bucket.consumeUninterruptibly(1);
-
-    this.streamWebsocket.send(
+    sendCommand(
         ProfitsSubscribe.builder()
             .streamSessionId(this.sessionId)
             .build()
@@ -561,9 +548,7 @@ public class XAPIClient {
   public void unsubscribeProfits() {
     log.trace("unsubscribeProfits()");
 
-    this.bucket.consumeUninterruptibly(1);
-
-    this.streamWebsocket.send(
+    sendCommand(
         ProfitsStop.builder()
             .build()
             .toJSONString()
@@ -579,9 +564,7 @@ public class XAPIClient {
   public Observable<SBalanceRecord> createBalanceStream() {
     log.trace("createBalanceStream()");
 
-    this.bucket.consumeUninterruptibly(1);
-
-    this.streamWebsocket.send(
+    sendCommand(
         BalanceSubscribe.builder()
             .streamSessionId(this.sessionId)
             .build()
@@ -598,13 +581,9 @@ public class XAPIClient {
   public void unsubscribeBalance() {
     log.trace("unsubscribeBalance()");
 
-    this.bucket.consumeUninterruptibly(1);
-
-    this.streamWebsocket.send(
-        BalanceStop.builder()
-            .build()
-            .toJSONString()
-    );
+    sendCommand(BalanceStop.builder()
+        .build()
+        .toJSONString());
 
     this.streamWebSocketListener.unsubscribeBalance();
   }
@@ -641,15 +620,11 @@ public class XAPIClient {
   public void subscribeCandle(final String symbol) {
     log.trace("subscribeCandleStream(symbol={})", symbol);
 
-    this.bucket.consumeUninterruptibly(1);
-
-    this.streamWebsocket.send(
-        CandlesSubscribe.builder()
-            .symbol(symbol)
-            .streamSessionId(this.sessionId)
-            .build()
-            .toJSONString()
-    );
+    sendCommand(CandlesSubscribe.builder()
+        .symbol(symbol)
+        .streamSessionId(this.sessionId)
+        .build()
+        .toJSONString());
   }
 
 
@@ -664,14 +639,10 @@ public class XAPIClient {
   public void unsubscribeCandle(final String symbol) {
     log.trace("unsubscribeCandle(symbol={})", symbol);
 
-    this.bucket.consumeUninterruptibly(1);
-
-    this.streamWebsocket.send(
-        CandlesStop.builder()
-            .symbol(symbol)
-            .build()
-            .toJSONString()
-    );
+    sendCommand(CandlesStop.builder()
+        .symbol(symbol)
+        .build()
+        .toJSONString());
 
     this.streamWebSocketListener.unsubscribeCandle();
   }
@@ -683,14 +654,10 @@ public class XAPIClient {
   public Observable<SKeepAliveRecord> createKeepAliveStream() {
     log.trace("createKeepAliveStream()");
 
-    this.bucket.consumeUninterruptibly(1);
-
-    this.streamWebsocket.send(
-        KeepAliveSubscribe.builder()
-            .streamSessionId(this.sessionId)
-            .build()
-            .toJSONString()
-    );
+    sendCommand(KeepAliveSubscribe.builder()
+        .streamSessionId(this.sessionId)
+        .build()
+        .toJSONString());
 
     return this.streamWebSocketListener.createKeepAliveStream();
   }
@@ -702,13 +669,9 @@ public class XAPIClient {
   public void unsubscribeKeepAlive() {
     log.trace("unsubscribeKeepAlive()");
 
-    this.bucket.consumeUninterruptibly(1);
-
-    this.streamWebsocket.send(
-        KeepAliveStop.builder()
-            .build()
-            .toJSONString()
-    );
+    sendCommand(KeepAliveStop.builder()
+        .build()
+        .toJSONString());
 
     this.streamWebSocketListener.unsubscribeKeepAlive();
   }
@@ -720,14 +683,10 @@ public class XAPIClient {
   public Observable<STradeStatusRecord> createTradesStatusStream() {
     log.trace("createTradesStatusStream()");
 
-    this.bucket.consumeUninterruptibly(1);
-
-    this.streamWebsocket.send(
-        TradeStatusRecordsSubscribe.builder()
-            .streamSessionId(this.sessionId)
-            .build()
-            .toJSONString()
-    );
+    sendCommand(TradeStatusRecordsSubscribe.builder()
+        .streamSessionId(this.sessionId)
+        .build()
+        .toJSONString());
 
     return this.streamWebSocketListener.createTradesStatusStream();
   }
@@ -739,13 +698,9 @@ public class XAPIClient {
   public void unsubscribeTradeStatus() {
     log.trace("unsubscribeTradeStatus()");
 
-    this.bucket.consumeUninterruptibly(1);
-
-    this.streamWebsocket.send(
-        TradeStatusRecordsStop.builder()
-            .build()
-            .toJSONString()
-    );
+    sendCommand(TradeStatusRecordsStop.builder()
+        .build()
+        .toJSONString());
 
     this.streamWebSocketListener.unsubscribeTradeStatus();
   }
