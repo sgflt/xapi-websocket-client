@@ -23,6 +23,8 @@
 package eu.qwsome.xapi.stream.records.response;
 
 
+import java.time.Instant;
+
 import lombok.Getter;
 import lombok.ToString;
 import org.json.JSONObject;
@@ -31,7 +33,7 @@ import org.json.JSONObject;
 @ToString
 abstract class WrapperTradeRecord implements BaseResponseRecord {
 
-  private double close_price;
+  private double closePrice;
   private boolean closed;
   private int cmd;
   private String comment;
@@ -40,14 +42,14 @@ abstract class WrapperTradeRecord implements BaseResponseRecord {
   private long order;
   private long order2;
   private double volume;
-  private double margin_rate;
-  private double open_price;
+  private double marginRate;
+  private double openPrice;
   private String symbol;
   private double storage;
   private int digits;
 
-  protected Long close_time;
-  protected Long expiration;
+  protected Instant closeTime;
+  protected Instant expiration;
   protected long position;
   protected Double profit;
   protected double sl;
@@ -56,7 +58,7 @@ abstract class WrapperTradeRecord implements BaseResponseRecord {
 
   @Override
   public void setFieldsFromJSONObject(final JSONObject ob) {
-    this.close_price = ob.getDouble("close_price");
+    this.closePrice = ob.getDouble("close_price");
     this.closed = ob.getBoolean("closed");
     this.cmd = ob.getInt("cmd");
     this.comment = ob.getString("comment");
@@ -65,8 +67,8 @@ abstract class WrapperTradeRecord implements BaseResponseRecord {
     this.order = ob.getLong("order");
     this.order2 = ob.getLong("order2");
     this.volume = ob.getDouble("volume");
-    this.margin_rate = ob.getDouble("margin_rate");
-    this.open_price = ob.getDouble("open_price");
+    this.marginRate = ob.getDouble("margin_rate");
+    this.openPrice = ob.getDouble("open_price");
     this.symbol = ob.getString("symbol");
     this.storage = ob.getDouble("storage");
     this.digits = ob.getInt("digits");

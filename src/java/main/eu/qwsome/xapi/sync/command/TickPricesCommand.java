@@ -23,6 +23,7 @@
 package eu.qwsome.xapi.sync.command;
 
 
+import java.time.Instant;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -33,12 +34,12 @@ public class TickPricesCommand extends BaseCommand {
   public TickPricesCommand(
       final Long level,
       final List<String> symbols,
-      final Long timestamp
+      final Instant timestamp
   ) {
     super(
         new JSONObject()
             .put("symbols", new JSONArray().putAll(symbols))
-            .put("timestamp", timestamp)
+            .put("timestamp", timestamp.toEpochMilli())
             .put("level", level)
     );
   }

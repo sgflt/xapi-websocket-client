@@ -23,6 +23,8 @@
 package eu.qwsome.xapi.stream.records.response;
 
 
+import java.time.Instant;
+
 import lombok.Getter;
 import lombok.ToString;
 import org.json.JSONObject;
@@ -31,11 +33,11 @@ import org.json.JSONObject;
 @ToString
 public class SKeepAliveRecord implements BaseResponseRecord {
 
-  private long timestamp;
+  private Instant timestamp;
 
 
   @Override
   public void setFieldsFromJSONObject(final JSONObject ob) {
-    this.timestamp = ob.getLong("timestamp");
+    this.timestamp = Instant.ofEpochMilli(ob.getLong("timestamp"));
   }
 }

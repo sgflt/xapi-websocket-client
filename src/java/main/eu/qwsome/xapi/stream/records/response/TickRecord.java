@@ -23,6 +23,8 @@
 package eu.qwsome.xapi.stream.records.response;
 
 
+import java.time.Instant;
+
 import lombok.Getter;
 import lombok.ToString;
 import org.json.JSONObject;
@@ -38,7 +40,7 @@ public class TickRecord implements BaseResponseRecord {
   private double high;
   private double low;
   private String symbol;
-  private long timestamp;
+  private Instant timestamp;
   private int level;
   private double spreadRaw;
   private double spreadTable;
@@ -56,11 +58,11 @@ public class TickRecord implements BaseResponseRecord {
 
     this.symbol = ob.getString("symbol");
 
-    this.timestamp = ob.getLong("timestamp");
+    this.timestamp = Instant.ofEpochMilli(ob.getLong("timestamp"));
 
     this.level = ob.getInt("level");
 
-    this.spreadRaw = (Double) ob.get("spreadRaw");
-    this.spreadTable = (Double) ob.get("spreadTable");
+    this.spreadRaw = ob.getDouble("spreadRaw");
+    this.spreadTable = ob.getDouble("spreadTable");
   }
 }

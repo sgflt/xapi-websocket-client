@@ -22,6 +22,8 @@
  */
 package eu.qwsome.xapi.stream.records.response;
 
+import java.time.Instant;
+
 import lombok.Getter;
 import lombok.ToString;
 import org.json.JSONObject;
@@ -45,9 +47,11 @@ public class STradeRecord extends WrapperTradeRecord {
     this.state = ob.getString("state");
 
     this.open_time = ob.getLong("open_time");
-    super.close_time = ob.optLong("close_time");
+    final var closeTime = ob.optLongObject("close_time", null);
+    super.closeTime = closeTime == null ? null : Instant.ofEpochMilli(closeTime);
 
-    super.expiration = ob.optLong("expiration");
+    final var expiration1 = ob.optLongObject("expiration", null);
+    super.expiration = expiration1 == null ? null : Instant.ofEpochMilli(expiration1);
 
     super.position = ob.getLong("position");
 

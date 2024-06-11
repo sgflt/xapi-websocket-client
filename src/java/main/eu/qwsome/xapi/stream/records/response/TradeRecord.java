@@ -23,6 +23,8 @@
 package eu.qwsome.xapi.stream.records.response;
 
 
+import java.time.Instant;
+
 import lombok.Getter;
 import lombok.ToString;
 import org.json.JSONObject;
@@ -33,7 +35,7 @@ public class TradeRecord extends WrapperTradeRecord {
 
   private long timestamp;
 
-  private Long open_time;
+  private Instant openTime;
 
 
   @Override
@@ -41,10 +43,13 @@ public class TradeRecord extends WrapperTradeRecord {
     super.setFieldsFromJSONObject(ob);
     this.timestamp = ob.getLong("timestamp");
 
-    this.open_time = ob.optLongObject("open_time");
+    final var openTime = ob.getLong("open_time");
+    this.openTime = Instant.ofEpochMilli(openTime);
 
-    super.close_time = ob.optLongObject("close_time", null);
-    super.expiration = ob.optLongObject("expiration", null);
+    final var closeTime = ob.optLongObject("close_time", null);
+    super.closeTime = closeTime == null ? null : Instant.ofEpochMilli(closeTime);
+    final var expiration1 = ob.optLongObject("expiration", null);
+    super.expiration = expiration1 == null ? null : Instant.ofEpochMilli(expiration1);
     super.position = ob.getLong("position");
     super.profit = ob.optDouble("profit");
     super.sl = ob.getDouble("sl");

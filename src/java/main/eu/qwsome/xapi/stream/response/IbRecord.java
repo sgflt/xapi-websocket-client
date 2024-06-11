@@ -23,6 +23,8 @@
 package eu.qwsome.xapi.stream.response;
 
 
+import java.time.Instant;
+
 import lombok.Data;
 import org.json.JSONObject;
 
@@ -39,7 +41,7 @@ public class IbRecord implements BaseResponseRecord {
   private String symbol;
   private Double volume;
   private String login;
-  private Long timestamp;
+  private Instant timestamp;
 
 
   @Override
@@ -48,11 +50,11 @@ public class IbRecord implements BaseResponseRecord {
       this.symbol = ob.getString("symbol");
       this.surname = ob.getString("surname");
       this.login = ob.getString("login");
-      this.openPrice = (Double) ob.get("openPrice");
-      this.nominal = (Double) ob.get("nominal");
-      this.closePrice = (Double) ob.get("closePrice");
-      this.volume = (Double) ob.get("volume");
-      this.timestamp = ob.getLong("timestamp");
+      this.openPrice = ob.getDouble("openPrice");
+      this.nominal = ob.getDouble("nominal");
+      this.closePrice = ob.getDouble("closePrice");
+      this.volume = ob.getDouble("volume");
+      this.timestamp = Instant.ofEpochMilli(ob.getLong("timestamp"));
       this.side = ob.getInt("side");
     }
   }
