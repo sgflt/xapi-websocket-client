@@ -61,7 +61,7 @@ abstract class WrapperTradeRecord implements BaseResponseRecord {
     this.closePrice = ob.getDouble("close_price");
     this.closed = ob.getBoolean("closed");
     this.cmd = ob.getInt("cmd");
-    this.comment = ob.getString("comment");
+    this.comment = ob.optString("comment");
     this.customComment = ob.optString("customComment");
     this.commission = ob.getDouble("commission");
     this.order = ob.getLong("order");
