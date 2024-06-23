@@ -20,32 +20,22 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package eu.qwsome.xapi.stream.records.request;
+package eu.qwsome.xapi.stream.codes;
 
-import lombok.Builder;
-import lombok.Data;
-import org.json.JSONObject;
+public final class PeriodResponseCode extends ResponseCode {
 
-import eu.qwsome.xapi.stream.codes.PeriodResponseCode;
-
-@Data
-@Builder
-public class ChartRangeInfoRecord {
-
-  private final String symbol;
-  private final PeriodResponseCode period;
-  private final long start;
-  private final long end;
-  private final long ticks;
+  private PeriodResponseCode(final long code) {
+    super(code);
+  }
 
 
-  public JSONObject toJSONObject() {
-    final var obj = new JSONObject();
-    obj.put("symbol", this.symbol);
-    obj.put("period", this.period.getCode());
-    obj.put("start", this.start);
-    obj.put("end", this.end);
-    obj.put("ticks", this.ticks);
-    return obj;
+  public PeriodCode toEnum() {
+    for (final PeriodCode supported : PeriodCode.values()) {
+      if (this.getCode() == supported.code) {
+        return supported;
+      }
+    }
+
+    throw new IllegalArgumentException();
   }
 }

@@ -230,13 +230,23 @@ public class XAPIClient {
 
     this.bucket.consumeUninterruptibly(1);
 
+    final var limitedStart = switch (period) {
+      case M1, M5, M15 ->
+          start.isBefore(Instant.now().minus(Duration.ofDays(30))) ? Instant.now().minus(Duration.ofDays(30)) : start;
+      case M30, H1 -> start.isBefore(Instant.now().minus(Duration.ofDays(7L * 30)))
+                      ? Instant.now().minus(Duration.ofDays(7L * 30))
+                      : start;
+      case H4, D1, W1, MN1 -> start.isBefore(Instant.now().minus(Duration.ofDays(13L * 30))) ? Instant.now()
+          .minus(Duration.ofDays(13L * 30)) : start;
+    };
+
     return this.syncListener.createGetChartLastRequestStream()
         .doOnSubscribe(disposable -> {
           this.syncListener.setCommand("getChartLastRequest");
           this.syncWebsocket.send(new ChartLastCommand(
               ChartLastInfoRecord.builder()
                   .symbol(symbol)
-                  .start(start.toEpochMilli())
+                  .start(limitedStart.toEpochMilli())
                   .period(period)
                   .build()
           ).toJSONString());
