@@ -23,6 +23,8 @@
 package eu.qwsome.xapi.stream.records.response;
 
 
+import java.time.Instant;
+
 import lombok.Getter;
 import lombok.ToString;
 import org.json.JSONObject;
@@ -31,7 +33,7 @@ import org.json.JSONObject;
 @ToString
 public class SCandleRecord implements BaseResponseRecord {
 
-  private long ctm;
+  private Instant ctm;
   private String ctmString;
   private double open;
   private double high;
@@ -44,7 +46,7 @@ public class SCandleRecord implements BaseResponseRecord {
 
   @Override
   public void setFieldsFromJSONObject(final JSONObject ob) {
-    this.ctm = ob.getLong("ctm");
+    this.ctm = Instant.ofEpochMilli(ob.getLong("ctm"));
     this.ctmString = ob.getString("ctmString");
     this.symbol = ob.getString("symbol");
     this.quoteId = ob.getInt("quoteId");
