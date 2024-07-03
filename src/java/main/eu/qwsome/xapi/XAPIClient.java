@@ -96,7 +96,7 @@ public class XAPIClient {
 
   private final BlockingBucket bucket = Bucket.builder()
       .withSynchronizationStrategy(SynchronizationStrategy.SYNCHRONIZED)
-      .addLimit(limit -> limit.capacity(5).refillIntervally(1, Duration.ofMillis(250)))
+      .addLimit(limit -> limit.capacity(3).refillIntervally(1, Duration.ofMillis(250)))
       .build().asBlocking();
 
   private final String symbol;
