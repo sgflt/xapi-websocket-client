@@ -23,15 +23,19 @@
 package eu.qwsome.xapi.stream.records.response;
 
 
+import java.time.Instant;
+
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.json.JSONObject;
 
 @Getter
+@Setter
 @ToString
 public class RateInfoRecord implements BaseResponseRecord {
 
-  private long ctm;
+  private Instant ctm;
   private double open;
   private double high;
   private double low;
@@ -39,40 +43,10 @@ public class RateInfoRecord implements BaseResponseRecord {
   private double vol;
 
 
-  public void setCtm(final long ctm) {
-    this.ctm = ctm;
-  }
-
-
-  public void setOpen(final double open) {
-    this.open = open;
-  }
-
-
-  public void setHigh(final double high) {
-    this.high = high;
-  }
-
-
-  public void setLow(final double low) {
-    this.low = low;
-  }
-
-
-  public void setClose(final double close) {
-    this.close = close;
-  }
-
-
-  public void setVol(final double vol) {
-    this.vol = vol;
-  }
-
-
   @Override
   public void setFieldsFromJSONObject(final JSONObject e) {
     this.setClose(e.getDouble("close"));
-    this.setCtm(e.getLong("ctm"));
+    this.setCtm(Instant.ofEpochMilli(e.getLong("ctm")));
     this.setHigh(e.getDouble("high"));
     this.setLow(e.getDouble("low"));
     this.setOpen(e.getDouble("open"));
