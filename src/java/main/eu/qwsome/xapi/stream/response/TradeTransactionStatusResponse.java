@@ -33,25 +33,23 @@ import eu.qwsome.xapi.stream.codes.RequestStatus;
 @ToString
 public class TradeTransactionStatusResponse extends BaseResponse {
 
-  private Double ask;
-  private Double bid;
-  private String message;
-  private Long order;
-  private RequestStatus requestStatus;
-  private String customComment;
+  private final Double ask;
+  private final Double bid;
+  private final String message;
+  private final Long order;
+  private final RequestStatus requestStatus;
+  private final String customComment;
 
 
   public TradeTransactionStatusResponse(final String body) {
     super(body);
 
     final var ob = (JSONObject) this.getReturnData();
-    if (getStatus()) {
-      this.ask = ob.getDouble("ask");
-      this.bid = ob.getDouble("bid");
-      this.order = ob.getLong("order");
-      this.message = ob.optString("message");
-      this.customComment = ob.optString("customComment");
-      this.requestStatus = new RequestStatus(ob.getLong("requestStatus"));
-    }
+    this.ask = ob.getDouble("ask");
+    this.bid = ob.getDouble("bid");
+    this.order = ob.getLong("order");
+    this.message = ob.optString("message");
+    this.customComment = ob.optString("customComment");
+    this.requestStatus = new RequestStatus(ob.getLong("requestStatus"));
   }
 }

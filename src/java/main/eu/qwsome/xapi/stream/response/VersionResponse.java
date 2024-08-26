@@ -27,7 +27,7 @@ import lombok.Getter;
 import lombok.ToString;
 import org.json.JSONObject;
 
-import eu.qwsome.xapi.stream.error.APIReplyParseException;
+import eu.qwsome.xapi.stream.error.XtbApiException;
 
 @Getter
 @ToString
@@ -36,7 +36,7 @@ public class VersionResponse extends BaseResponse {
   private final String version;
 
 
-  public VersionResponse(final String body) throws APIReplyParseException, XAPIResponseException {
+  public VersionResponse(final String body) throws XtbApiException, XAPIResponseException {
     super(body);
 
     final var ob = (JSONObject) this.getReturnData();

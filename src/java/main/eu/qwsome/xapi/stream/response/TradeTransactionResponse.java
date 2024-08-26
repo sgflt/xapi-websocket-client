@@ -31,15 +31,13 @@ import org.json.JSONObject;
 @ToString
 public class TradeTransactionResponse extends BaseResponse {
 
-  private long order;
+  private final long order;
 
 
   public TradeTransactionResponse(final String body) {
     super(body);
 
     final var ob = (JSONObject) this.getReturnData();
-    if (getStatus()) {
-      this.order = ob.getLong("order");
-    }
+    this.order = ob.getLong("order");
   }
 }

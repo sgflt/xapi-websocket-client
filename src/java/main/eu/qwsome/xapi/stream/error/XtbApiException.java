@@ -22,24 +22,24 @@
  */
 package eu.qwsome.xapi.stream.error;
 
-public class APIReplyParseException extends RuntimeException {
+public class XtbApiException extends RuntimeException {
 
 
   /**
    * Creates a new instance of
-   * <code>APIReplyParseException</code> without detail message.
+   * <code>XtbApiException</code> without detail message.
    */
-  public APIReplyParseException() {
+  public XtbApiException() {
   }
 
 
   /**
    * Constructs an instance of
-   * <code>APIReplyParseException</code> with the specified detail message.
+   * <code>XtbApiException</code> with the specified detail message.
    *
    * @param msg the detail message.
    */
-  public APIReplyParseException(final String msg) {
+  public XtbApiException(final String msg) {
     super(msg);
   }
 }

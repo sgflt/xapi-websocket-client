@@ -28,13 +28,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import eu.qwsome.xapi.stream.codes.ErrorCode;
-import eu.qwsome.xapi.stream.error.APIReplyParseException;
+import eu.qwsome.xapi.stream.error.XtbApiException;
 
 @Getter
 @ToString
 public class BaseResponse {
 
-  private final Boolean status;
+  private final boolean status;
   private final String errorDescr;
   private final ErrorCode errCode;
   private final Object returnData;
@@ -48,12 +48,17 @@ public class BaseResponse {
       this.status = ob.getBoolean("status");
       this.errCode = ob.has("errorCode") ? new ErrorCode(ob.getString("errorCode")) : null;
       this.errorDescr = ob.optString("errorDescr");
+
+      if (!this.status) {
+        throw new XtbApiException(String.format("%s | %s", this.errCode, this.errorDescr));
+      }
+
       this.returnData = ob.has("returnData") ? ob.get("returnData") : null;
       this.streamSessionId = ob.optString("streamSessionId");
 
       parseRedirect(ob);
     } catch (final JSONException e) {
-      throw new APIReplyParseException("JSON Parse exception: " + body);
+      throw new XtbApiException("JSON Parse exception: " + body);
     }
   }
 

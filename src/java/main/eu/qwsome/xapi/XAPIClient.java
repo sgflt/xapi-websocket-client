@@ -220,12 +220,16 @@ public class XAPIClient {
   }
 
 
-  public ChartResponse getChartLastRequest(final Instant start, final PeriodCode period) {
+  public @NonNull Single<ChartResponse> getChartLastRequest(final Instant start, final PeriodCode period) {
     return getChartLastRequest(this.symbol, start, period);
   }
 
 
-  public ChartResponse getChartLastRequest(final String symbol, final Instant start, final PeriodCode period) {
+  public @NonNull Single<ChartResponse> getChartLastRequest(
+      final String symbol,
+      final Instant start,
+      final PeriodCode period
+  ) {
     log.trace("getChartLastRequest(symbol={}, start={}, period={})", symbol, start, period);
 
     this.bucket.consumeUninterruptibly(1);
@@ -250,7 +254,7 @@ public class XAPIClient {
                   .period(period)
                   .build()
           ).toJSONString());
-        }).blockingGet();
+        });
   }
 
 

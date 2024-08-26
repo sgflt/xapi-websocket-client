@@ -31,7 +31,7 @@ import lombok.ToString;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import eu.qwsome.xapi.stream.error.APIReplyParseException;
+import eu.qwsome.xapi.stream.error.XtbApiException;
 import eu.qwsome.xapi.stream.records.response.TickRecord;
 
 @Getter
@@ -41,7 +41,7 @@ public class TickPricesResponse extends BaseResponse {
   private final List<TickRecord> ticks;
 
 
-  public TickPricesResponse(final String body) throws APIReplyParseException, XAPIResponseException {
+  public TickPricesResponse(final String body) throws XtbApiException, XAPIResponseException {
     super(body);
 
     final var ob = (JSONObject) this.getReturnData();
