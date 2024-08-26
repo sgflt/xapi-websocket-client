@@ -69,8 +69,9 @@ public class MainWebsocketListener extends WebSocketListener {
       @Nullable final Response response
   ) {
     this.loginSubject.onError(t);
-    this.allSymbolsSubject.onError(t);
     this.tradeTransactionSubject.onError(t);
+    this.tradeTransactionStatusSubject.onError(t);
+    this.allSymbolsSubject.onError(t);
     this.getSymbolSubject.onError(t);
     this.getTradesSubject.onError(t);
     this.getChartLastRequestSubject.onError(t);

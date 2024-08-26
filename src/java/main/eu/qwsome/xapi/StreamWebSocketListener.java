@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
+import eu.qwsome.xapi.stream.error.XtbApiException;
 import eu.qwsome.xapi.stream.records.response.SBalanceRecord;
 import eu.qwsome.xapi.stream.records.response.SCandleRecord;
 import eu.qwsome.xapi.stream.records.response.SKeepAliveRecord;
@@ -99,26 +100,37 @@ public class StreamWebSocketListener extends WebSocketListener {
         final var brr = new ResponseParser().parse(command, data);
         // TODO parse in constructor
         brr.setFieldsFromJSONObject(data);
-
-        if (brr instanceof final SBalanceRecord balanceRecord) {
-          this.balanceSubject.onNext(balanceRecord);
-        } else if (brr instanceof final STickRecord tickRecord) {
-          this.priceSubject.onNext(tickRecord);
-        } else if (brr instanceof final STradeRecord tradeRecord) {
-          this.tradeSubject.onNext(tradeRecord);
-        } else if (brr instanceof final STradeStatusRecord tradeStatusRecord) {
-          this.tradeStatusSubject.onNext(tradeStatusRecord);
-        } else if (brr instanceof final SNewsRecord newsRecord) {
-          this.newsSubject.onNext(newsRecord);
-        } else if (brr instanceof final SCandleRecord candleRecord) {
-          this.candleSubject.onNext(candleRecord);
-        } else if (brr instanceof final SKeepAliveRecord keepAliveRecord) {
-          this.keepAliveSubject.onNext(keepAliveRecord);
-        } else if (brr instanceof final SProfitRecord profitRecord) {
-          this.profitsSubject.onNext(profitRecord);
+        try {
+          switch (brr) {
+            case final SBalanceRecord balanceRecord -> this.balanceSubject.onNext(balanceRecord);
+            case final STickRecord tickRecord -> this.priceSubject.onNext(tickRecord);
+            case final STradeRecord tradeRecord -> this.tradeSubject.onNext(tradeRecord);
+            case final STradeStatusRecord tradeStatusRecord -> this.tradeStatusSubject.onNext(tradeStatusRecord);
+            case final SNewsRecord newsRecord -> this.newsSubject.onNext(newsRecord);
+            case final SCandleRecord candleRecord -> this.candleSubject.onNext(candleRecord);
+            case final SKeepAliveRecord keepAliveRecord -> this.keepAliveSubject.onNext(keepAliveRecord);
+            case final SProfitRecord profitRecord -> this.profitsSubject.onNext(profitRecord);
+            default -> log.error("Unknown command {}", command);
+          }
+        } catch (final XtbApiException e) {
+          handleException(e);
         }
       }
     }
+  }
+
+
+  private void handleException(final XtbApiException e) {
+    log.error("XtbApiException", e);
+
+    this.balanceSubject.onError(e);
+    this.priceSubject.onError(e);
+    this.tradeSubject.onError(e);
+    this.tradeStatusSubject.onError(e);
+    this.newsSubject.onError(e);
+    this.candleSubject.onError(e);
+    this.keepAliveSubject.onError(e);
+    this.profitsSubject.onError(e);
   }
 
 
