@@ -37,7 +37,7 @@ public class STradeStatusRecord implements BaseResponseRecord {
   private RequestStatus requestStatus;
   private String message;
   private String customComment;
-  private Double price;
+  private double price;
 
 
   @Override

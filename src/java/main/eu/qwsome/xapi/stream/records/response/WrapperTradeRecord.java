@@ -51,7 +51,7 @@ abstract class WrapperTradeRecord implements BaseResponseRecord {
   protected Instant closeTime;
   protected Instant expiration;
   protected long position;
-  protected Double profit;
+  protected double profit;
   protected double sl;
   protected double tp;
 

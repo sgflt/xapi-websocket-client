@@ -37,7 +37,7 @@ public class STradeRecord extends WrapperTradeRecord {
   private StreamingTradeType type;
   private String state;
 
-  private long open_time;
+  private Instant openTime;
 
 
   @Override
@@ -46,7 +46,7 @@ public class STradeRecord extends WrapperTradeRecord {
     this.type = new StreamingTradeType(ob.getLong("type"));
     this.state = ob.getString("state");
 
-    this.open_time = ob.getLong("open_time");
+    this.openTime = Instant.ofEpochMilli(ob.getLong("open_time"));
     final var closeTime = ob.optLongObject("close_time", null);
     super.closeTime = closeTime == null ? null : Instant.ofEpochMilli(closeTime);
 

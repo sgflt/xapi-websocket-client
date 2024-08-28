@@ -33,10 +33,10 @@ import eu.qwsome.xapi.stream.codes.RequestStatus;
 @ToString
 public class TradeTransactionStatusResponse extends BaseResponse {
 
-  private final Double ask;
-  private final Double bid;
+  private final double ask;
+  private final double bid;
   private final String message;
-  private final Long order;
+  private final long order;
   private final RequestStatus requestStatus;
   private final String customComment;
 
