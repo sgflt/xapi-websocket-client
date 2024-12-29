@@ -32,16 +32,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
-import eu.qwsome.xapi.stream.error.XtbApiException;
-import eu.qwsome.xapi.stream.records.response.SBalanceRecord;
-import eu.qwsome.xapi.stream.records.response.SCandleRecord;
-import eu.qwsome.xapi.stream.records.response.SKeepAliveRecord;
-import eu.qwsome.xapi.stream.records.response.SNewsRecord;
-import eu.qwsome.xapi.stream.records.response.SProfitRecord;
-import eu.qwsome.xapi.stream.records.response.STickRecord;
-import eu.qwsome.xapi.stream.records.response.STradeRecord;
-import eu.qwsome.xapi.stream.records.response.STradeStatusRecord;
-import eu.qwsome.xapi.stream.response.ResponseParser;
+import eu.qwsome.xapi.error.XtbApiException;
+import eu.qwsome.xapi.stream.ResponseParser;
+import eu.qwsome.xapi.stream.subscription.balance.SBalanceRecord;
+import eu.qwsome.xapi.stream.subscription.candle.SCandleRecord;
+import eu.qwsome.xapi.stream.subscription.keepalive.SKeepAliveRecord;
+import eu.qwsome.xapi.stream.subscription.news.SNewsRecord;
+import eu.qwsome.xapi.stream.subscription.profit.SProfitRecord;
+import eu.qwsome.xapi.stream.subscription.tick.STickRecord;
+import eu.qwsome.xapi.stream.subscription.trade.STradeRecord;
+import eu.qwsome.xapi.stream.subscription.trade.status.STradeStatusRecord;
 
 @Slf4j
 public class StreamWebSocketListener extends WebSocketListener {

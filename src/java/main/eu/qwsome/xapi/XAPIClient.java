@@ -39,52 +39,52 @@ import okhttp3.Request;
 import okhttp3.WebSocket;
 import org.jetbrains.annotations.NotNull;
 
-import eu.qwsome.xapi.stream.codes.PeriodCode;
-import eu.qwsome.xapi.stream.codes.TradeOperationCode;
-import eu.qwsome.xapi.stream.codes.TradeTransactionType;
-import eu.qwsome.xapi.stream.records.request.ChartLastInfoRecord;
-import eu.qwsome.xapi.stream.records.request.TradeTransInfoRecord;
-import eu.qwsome.xapi.stream.records.response.SBalanceRecord;
-import eu.qwsome.xapi.stream.records.response.SCandleRecord;
-import eu.qwsome.xapi.stream.records.response.SKeepAliveRecord;
-import eu.qwsome.xapi.stream.records.response.SNewsRecord;
-import eu.qwsome.xapi.stream.records.response.SProfitRecord;
-import eu.qwsome.xapi.stream.records.response.STickRecord;
-import eu.qwsome.xapi.stream.records.response.STradeRecord;
-import eu.qwsome.xapi.stream.records.response.STradeStatusRecord;
-import eu.qwsome.xapi.stream.response.AllSymbolsResponse;
-import eu.qwsome.xapi.stream.response.ChartResponse;
-import eu.qwsome.xapi.stream.response.LoginResponse;
-import eu.qwsome.xapi.stream.response.SymbolResponse;
-import eu.qwsome.xapi.stream.response.TradeTransactionResponse;
-import eu.qwsome.xapi.stream.response.TradeTransactionStatusResponse;
-import eu.qwsome.xapi.stream.response.TradesResponse;
-import eu.qwsome.xapi.stream.subscription.BalanceStop;
-import eu.qwsome.xapi.stream.subscription.BalanceSubscribe;
-import eu.qwsome.xapi.stream.subscription.CandlesStop;
-import eu.qwsome.xapi.stream.subscription.CandlesSubscribe;
-import eu.qwsome.xapi.stream.subscription.KeepAliveStop;
-import eu.qwsome.xapi.stream.subscription.KeepAliveSubscribe;
-import eu.qwsome.xapi.stream.subscription.NewsStop;
-import eu.qwsome.xapi.stream.subscription.NewsSubscribe;
-import eu.qwsome.xapi.stream.subscription.ProfitsStop;
-import eu.qwsome.xapi.stream.subscription.ProfitsSubscribe;
+import eu.qwsome.xapi.codes.TradeOperationCode;
 import eu.qwsome.xapi.stream.subscription.StreamPingCommand;
-import eu.qwsome.xapi.stream.subscription.TickPricesStop;
-import eu.qwsome.xapi.stream.subscription.TickPricesSubscribe;
-import eu.qwsome.xapi.stream.subscription.TradeRecordsStop;
-import eu.qwsome.xapi.stream.subscription.TradeRecordsSubscribe;
-import eu.qwsome.xapi.stream.subscription.TradeStatusRecordsStop;
-import eu.qwsome.xapi.stream.subscription.TradeStatusRecordsSubscribe;
-import eu.qwsome.xapi.sync.Credentials;
-import eu.qwsome.xapi.sync.command.AllSymbolsCommand;
-import eu.qwsome.xapi.sync.command.ChartLastCommand;
-import eu.qwsome.xapi.sync.command.LoginCommand;
-import eu.qwsome.xapi.sync.command.PingCommand;
-import eu.qwsome.xapi.sync.command.SymbolCommand;
-import eu.qwsome.xapi.sync.command.TradeTransactionCommand;
-import eu.qwsome.xapi.sync.command.TradeTransactionStatusCommand;
-import eu.qwsome.xapi.sync.command.TradesCommand;
+import eu.qwsome.xapi.stream.subscription.balance.BalanceStop;
+import eu.qwsome.xapi.stream.subscription.balance.BalanceSubscribe;
+import eu.qwsome.xapi.stream.subscription.balance.SBalanceRecord;
+import eu.qwsome.xapi.stream.subscription.candle.CandlesStop;
+import eu.qwsome.xapi.stream.subscription.candle.CandlesSubscribe;
+import eu.qwsome.xapi.stream.subscription.candle.SCandleRecord;
+import eu.qwsome.xapi.stream.subscription.keepalive.KeepAliveStop;
+import eu.qwsome.xapi.stream.subscription.keepalive.KeepAliveSubscribe;
+import eu.qwsome.xapi.stream.subscription.keepalive.SKeepAliveRecord;
+import eu.qwsome.xapi.stream.subscription.news.NewsStop;
+import eu.qwsome.xapi.stream.subscription.news.NewsSubscribe;
+import eu.qwsome.xapi.stream.subscription.news.SNewsRecord;
+import eu.qwsome.xapi.stream.subscription.profit.ProfitsStop;
+import eu.qwsome.xapi.stream.subscription.profit.ProfitsSubscribe;
+import eu.qwsome.xapi.stream.subscription.profit.SProfitRecord;
+import eu.qwsome.xapi.stream.subscription.tick.STickRecord;
+import eu.qwsome.xapi.stream.subscription.tick.TickPricesStop;
+import eu.qwsome.xapi.stream.subscription.tick.TickPricesSubscribe;
+import eu.qwsome.xapi.stream.subscription.trade.STradeRecord;
+import eu.qwsome.xapi.stream.subscription.trade.TradeRecordsStop;
+import eu.qwsome.xapi.stream.subscription.trade.TradeRecordsSubscribe;
+import eu.qwsome.xapi.stream.subscription.trade.status.STradeStatusRecord;
+import eu.qwsome.xapi.stream.subscription.trade.status.TradeStatusRecordsStop;
+import eu.qwsome.xapi.stream.subscription.trade.status.TradeStatusRecordsSubscribe;
+import eu.qwsome.xapi.sync.chart.ChartLastCommand;
+import eu.qwsome.xapi.sync.chart.ChartLastInfoRecord;
+import eu.qwsome.xapi.sync.chart.ChartResponse;
+import eu.qwsome.xapi.sync.chart.PeriodCode;
+import eu.qwsome.xapi.sync.login.Credentials;
+import eu.qwsome.xapi.sync.login.LoginCommand;
+import eu.qwsome.xapi.sync.login.LoginResponse;
+import eu.qwsome.xapi.sync.ping.PingCommand;
+import eu.qwsome.xapi.sync.symbol.SymbolCommand;
+import eu.qwsome.xapi.sync.symbol.SymbolResponse;
+import eu.qwsome.xapi.sync.symbol.all.AllSymbolsCommand;
+import eu.qwsome.xapi.sync.symbol.all.AllSymbolsResponse;
+import eu.qwsome.xapi.sync.trade.TradeRecordsResponse;
+import eu.qwsome.xapi.sync.trade.TradesCommand;
+import eu.qwsome.xapi.sync.transaction.TradeTransInfoRecord;
+import eu.qwsome.xapi.sync.transaction.TradeTransactionCommand;
+import eu.qwsome.xapi.sync.transaction.TradeTransactionResponse;
+import eu.qwsome.xapi.sync.transaction.TradeTransactionType;
+import eu.qwsome.xapi.sync.transaction.status.TradeTransactionStatusCommand;
+import eu.qwsome.xapi.sync.transaction.status.TradeTransactionStatusResponse;
 
 /**
  * Client that is usable for single symbol trading
@@ -202,7 +202,7 @@ public class XAPIClient {
   }
 
 
-  public TradesResponse getOpenedTrades() {
+  public TradeRecordsResponse getOpenedTrades() {
     log.trace("getOpenedTrades()");
 
     this.bucket.consumeUninterruptibly(1);
@@ -211,7 +211,7 @@ public class XAPIClient {
   }
 
 
-  public TradesResponse getAllTrades() {
+  public TradeRecordsResponse getAllTrades() {
     log.trace("getAllTrades()");
 
     this.bucket.consumeUninterruptibly(1);
@@ -258,7 +258,7 @@ public class XAPIClient {
   }
 
 
-  private @NotNull TradesResponse getTrades(final boolean openedOnly) {
+  private @NotNull TradeRecordsResponse getTrades(final boolean openedOnly) {
     log.trace("getTrades(openedOnly={})", openedOnly);
 
     this.bucket.consumeUninterruptibly(1);

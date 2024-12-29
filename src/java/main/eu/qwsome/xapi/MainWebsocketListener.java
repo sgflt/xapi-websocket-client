@@ -34,14 +34,14 @@ import okhttp3.WebSocketListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import eu.qwsome.xapi.stream.response.AllSymbolsResponse;
-import eu.qwsome.xapi.stream.response.ChartResponse;
-import eu.qwsome.xapi.stream.response.LoginResponse;
-import eu.qwsome.xapi.stream.response.ResponseParser;
-import eu.qwsome.xapi.stream.response.SymbolResponse;
-import eu.qwsome.xapi.stream.response.TradeTransactionResponse;
-import eu.qwsome.xapi.stream.response.TradeTransactionStatusResponse;
-import eu.qwsome.xapi.stream.response.TradesResponse;
+import eu.qwsome.xapi.sync.ResponseParser;
+import eu.qwsome.xapi.sync.chart.ChartResponse;
+import eu.qwsome.xapi.sync.login.LoginResponse;
+import eu.qwsome.xapi.sync.symbol.SymbolResponse;
+import eu.qwsome.xapi.sync.symbol.all.AllSymbolsResponse;
+import eu.qwsome.xapi.sync.trade.TradeRecordsResponse;
+import eu.qwsome.xapi.sync.transaction.TradeTransactionResponse;
+import eu.qwsome.xapi.sync.transaction.status.TradeTransactionStatusResponse;
 
 /**
  * Allows only one command to be executed at the same time.
@@ -56,7 +56,7 @@ public class MainWebsocketListener extends WebSocketListener {
   private SingleSubject<TradeTransactionStatusResponse> tradeTransactionStatusSubject = SingleSubject.create();
   private SingleSubject<AllSymbolsResponse> allSymbolsSubject = SingleSubject.create();
   private SingleSubject<SymbolResponse> getSymbolSubject = SingleSubject.create();
-  private SingleSubject<TradesResponse> getTradesSubject = SingleSubject.create();
+  private SingleSubject<TradeRecordsResponse> getTradesSubject = SingleSubject.create();
   private SingleSubject<ChartResponse> getChartLastRequestSubject = SingleSubject.create();
 
   private final LinkedBlockingDeque<String> command = new LinkedBlockingDeque<>(1);
@@ -152,7 +152,7 @@ public class MainWebsocketListener extends WebSocketListener {
   }
 
 
-  public Single<TradesResponse> createGetTradesStream() {
+  public Single<TradeRecordsResponse> createGetTradesStream() {
     this.getTradesSubject = SingleSubject.create();
     return this.getTradesSubject.observeOn(Schedulers.io());
   }
