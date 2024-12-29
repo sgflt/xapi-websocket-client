@@ -35,12 +35,11 @@ public class LoginResponse extends SynchronousResponse {
   private RedirectRecord redirect;
 
 
-  public LoginResponse(final String body) {
+  public LoginResponse(final JSONObject body) {
     super(body);
-    final JSONObject redirectJson = super.getRedirectJson();
+    final var redirectJson = getRedirectJson();
     if (redirectJson != null) {
-      this.redirect = new RedirectRecord();
-      this.redirect.setFieldsFromJSONObject(redirectJson);
+      this.redirect = new RedirectRecord(redirectJson);
     }
   }
 

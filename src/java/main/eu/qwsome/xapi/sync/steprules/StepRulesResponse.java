@@ -42,10 +42,10 @@ public class StepRulesResponse extends SynchronousResponse {
   private final List<List<StepRecord>> stepRecords;
 
 
-  public StepRulesResponse(final String body) {
+  public StepRulesResponse(final JSONObject body) {
     super(body);
 
-    final var returnDataArray = (JSONArray) this.getReturnData();
+    final var returnDataArray = (JSONArray) getReturnData();
     this.ids = new ArrayList<>(returnDataArray.length());
     this.names = new ArrayList<>(returnDataArray.length());
     this.stepRecords = new ArrayList<>(returnDataArray.length());
@@ -62,8 +62,7 @@ public class StepRulesResponse extends SynchronousResponse {
       final var stepsList = new ArrayList<StepRecord>(stepsArray.length());
       for (final var object : stepsArray) {
         final var e = (JSONObject) object;
-        final var rec = new StepRecord();
-        rec.setFieldsFromJSONObject(e);
+        final var rec = new StepRecord(e);
         stepsList.add(rec);
       }
 

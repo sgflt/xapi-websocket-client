@@ -22,10 +22,9 @@
  */
 package eu.qwsome.xapi.stream;
 
-import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
-import eu.qwsome.xapi.response.BaseResponseRecord;
+import eu.qwsome.xapi.error.XtbApiException;
 import eu.qwsome.xapi.stream.subscription.balance.SBalanceRecord;
 import eu.qwsome.xapi.stream.subscription.candle.SCandleRecord;
 import eu.qwsome.xapi.stream.subscription.keepalive.SKeepAliveRecord;
@@ -37,38 +36,17 @@ import eu.qwsome.xapi.stream.subscription.trade.status.STradeStatusRecord;
 
 public class ResponseParser {
 
-  public BaseResponseRecord parse(final String command, final JSONObject json) {
-
-    final var object = getObject(command);
-    if (object != null) {
-      object.setFieldsFromJSONObject(json);
-    }
-    return object;
-  }
-
-
-  @Nullable
-  private static BaseResponseRecord getObject(final String command) {
-    BaseResponseRecord result = null;
-    if (command != null) {
-      if (command.equals("tickPrices")) {
-        result = new STickRecord();
-      } else if (command.equals("trade")) {
-        result = new STradeRecord();
-      } else if (command.equals("balance")) {
-        result = new SBalanceRecord();
-      } else if (command.equals("tradeStatus")) {
-        result = new STradeStatusRecord();
-      } else if (command.equals("profit")) {
-        result = new SProfitRecord();
-      } else if (command.equals("news")) {
-        result = new SNewsRecord();
-      } else if (command.equals("keepAlive")) {
-        result = new SKeepAliveRecord();
-      } else if (command.equals("candle")) {
-        result = new SCandleRecord();
-      }
-    }
-    return result;
+  public Object parse(final String command, final JSONObject json) {
+    return switch (command) {
+      case "tickPrices" -> new STickRecord(json);
+      case "trade" -> new STradeRecord(json);
+      case "balance" -> new SBalanceRecord(json);
+      case "tradeStatus" -> new STradeStatusRecord(json);
+      case "profit" -> new SProfitRecord(json);
+      case "news" -> new SNewsRecord(json);
+      case "keepAlive" -> new SKeepAliveRecord(json);
+      case "candle" -> new SCandleRecord(json);
+      default -> throw new XtbApiException("Unexpected value: " + command);
+    };
   }
 }

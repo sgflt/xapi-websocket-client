@@ -36,10 +36,10 @@ public class TradeTransactionResponse extends SynchronousResponse {
   private final long order;
 
 
-  public TradeTransactionResponse(final String body) {
+  public TradeTransactionResponse(final JSONObject body) {
     super(body);
 
-    final var ob = (JSONObject) this.getReturnData();
+    final var ob = (JSONObject) getReturnData();
     this.order = ob.getLong("order");
   }
 }

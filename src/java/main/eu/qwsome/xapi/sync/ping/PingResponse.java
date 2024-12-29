@@ -24,13 +24,14 @@ package eu.qwsome.xapi.sync.ping;
 
 
 import lombok.ToString;
+import org.json.JSONObject;
 
 import eu.qwsome.xapi.sync.SynchronousResponse;
 
 @ToString
 public class PingResponse extends SynchronousResponse {
 
-  public PingResponse(final String body) {
+  public PingResponse(final JSONObject body) {
     super(body);
   }
 }

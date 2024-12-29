@@ -31,16 +31,15 @@ import org.json.JSONObject;
 
 @Getter
 @ToString
-public abstract class AbstractNewsRecord implements BaseResponseRecord {
+public abstract class AbstractNewsRecord {
 
-  protected String body; //may not be present
-  protected String title;
-  protected String key;
-  protected Instant time;
+  private final String body; //may not be present
+  private final String title;
+  private final String key;
+  private final Instant time;
 
 
-  @Override
-  public void setFieldsFromJSONObject(final JSONObject ob) {
+  protected AbstractNewsRecord(final JSONObject ob) {
     this.key = ob.getString("key");
     this.time = Instant.ofEpochMilli(ob.getLong("time"));
     this.title = ob.getString("title");

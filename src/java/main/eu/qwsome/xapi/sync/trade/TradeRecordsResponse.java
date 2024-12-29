@@ -40,7 +40,7 @@ public class TradeRecordsResponse extends SynchronousResponse {
   private final List<TradeRecord> tradeRecords;
 
 
-  public TradeRecordsResponse(final String body) {
+  public TradeRecordsResponse(final JSONObject body) {
     super(body);
 
     final var arr = (JSONArray) this.getReturnData();
@@ -48,8 +48,7 @@ public class TradeRecordsResponse extends SynchronousResponse {
 
     for (final var o : arr) {
       final var e = (JSONObject) o;
-      final var tradeRecord = new TradeRecord();
-      tradeRecord.setFieldsFromJSONObject(e);
+      final var tradeRecord = new TradeRecord(e);
       this.tradeRecords.add(tradeRecord);
     }
   }

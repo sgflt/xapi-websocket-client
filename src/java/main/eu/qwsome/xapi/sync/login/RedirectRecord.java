@@ -27,19 +27,16 @@ import lombok.Getter;
 import lombok.ToString;
 import org.json.JSONObject;
 
-import eu.qwsome.xapi.response.BaseResponseRecord;
-
 @Getter
 @ToString
-public class RedirectRecord implements BaseResponseRecord {
+public class RedirectRecord {
 
-  private int mainPort;
-  private int streamingPort;
-  private String address;
+  private final int mainPort;
+  private final int streamingPort;
+  private final String address;
 
 
-  @Override
-  public void setFieldsFromJSONObject(final JSONObject ob) {
+  public RedirectRecord(final JSONObject ob) {
     this.mainPort = ob.getInt("mainPort");
     this.streamingPort = ob.getInt("streamingPort");
     this.address = ob.getString("address");

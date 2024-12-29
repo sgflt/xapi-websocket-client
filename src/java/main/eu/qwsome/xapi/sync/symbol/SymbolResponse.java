@@ -36,11 +36,10 @@ public class SymbolResponse extends SynchronousResponse {
   private final SymbolRecord symbol;
 
 
-  public SymbolResponse(final String body) {
+  public SymbolResponse(final JSONObject body) {
     super(body);
 
-    final var ob = (JSONObject) this.getReturnData();
-    this.symbol = new SymbolRecord();
-    this.symbol.setFieldsFromJSONObject(ob);
+    final var ob = (JSONObject) getReturnData();
+    this.symbol = new SymbolRecord(ob);
   }
 }

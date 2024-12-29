@@ -26,32 +26,27 @@ package eu.qwsome.xapi.sync.chart;
 import java.time.Instant;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 import org.json.JSONObject;
 
-import eu.qwsome.xapi.response.BaseResponseRecord;
-
 @Getter
-@Setter
 @ToString
-public class RateInfoRecord implements BaseResponseRecord {
+public class RateInfoRecord {
 
-  private Instant ctm;
-  private double open;
-  private double high;
-  private double low;
-  private double close;
-  private double vol;
+  private final Instant ctm;
+  private final double open;
+  private final double high;
+  private final double low;
+  private final double close;
+  private final double vol;
 
 
-  @Override
-  public void setFieldsFromJSONObject(final JSONObject e) {
-    this.setClose(e.getDouble("close"));
-    this.setCtm(Instant.ofEpochMilli(e.getLong("ctm")));
-    this.setHigh(e.getDouble("high"));
-    this.setLow(e.getDouble("low"));
-    this.setOpen(e.getDouble("open"));
-    this.setVol(e.getDouble("vol"));
+  public RateInfoRecord(final JSONObject e) {
+    this.close = e.getDouble("close");
+    this.ctm = Instant.ofEpochMilli(e.getLong("ctm"));
+    this.high = e.getDouble("high");
+    this.low = e.getDouble("low");
+    this.open = e.getDouble("open");
+    this.vol = e.getDouble("vol");
   }
 }

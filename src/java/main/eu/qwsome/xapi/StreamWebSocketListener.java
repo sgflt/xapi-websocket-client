@@ -98,8 +98,6 @@ public class StreamWebSocketListener extends WebSocketListener {
       final var data = (JSONObject) jsonObject.get("data");
       if (command != null) {
         final var brr = new ResponseParser().parse(command, data);
-        // TODO parse in constructor
-        brr.setFieldsFromJSONObject(data);
         try {
           switch (brr) {
             case final SBalanceRecord balanceRecord -> this.balanceSubject.onNext(balanceRecord);

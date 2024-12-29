@@ -22,8 +22,6 @@
  */
 package eu.qwsome.xapi.stream.subscription.trade;
 
-import java.time.Instant;
-
 import lombok.Getter;
 import lombok.ToString;
 import org.json.JSONObject;
@@ -34,30 +32,13 @@ import eu.qwsome.xapi.response.AbstractTradeRecord;
 @ToString
 public class STradeRecord extends AbstractTradeRecord {
 
-  private StreamingTradeType type;
-  private String state;
-
-  private Instant openTime;
+  private final StreamingTradeType type;
+  private final String state;
 
 
-  @Override
-  public void setFieldsFromJSONObject(final JSONObject ob) {
-    super.setFieldsFromJSONObject(ob);
-    this.type = new StreamingTradeType(ob.getLong("type"));
-    this.state = ob.getString("state");
-
-    this.openTime = Instant.ofEpochMilli(ob.getLong("open_time"));
-    final var closeTime = ob.optLongObject("close_time", null);
-    super.closeTime = closeTime == null ? null : Instant.ofEpochMilli(closeTime);
-
-    final var expiration1 = ob.optLongObject("expiration", null);
-    super.expiration = expiration1 == null ? null : Instant.ofEpochMilli(expiration1);
-
-    super.position = ob.getLong("position");
-
-    super.profit = ob.optDouble("profit");
-
-    super.sl = ob.getDouble("sl");
-    super.tp = ob.getDouble("tp");
+  public STradeRecord(final JSONObject json) {
+    super(json);
+    this.type = new StreamingTradeType(json.getLong("type"));
+    this.state = json.getString("state");
   }
 }

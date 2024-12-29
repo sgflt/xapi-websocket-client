@@ -23,6 +23,7 @@
 package eu.qwsome.xapi.stream.subscription.news;
 
 import lombok.ToString;
+import org.json.JSONObject;
 
 import eu.qwsome.xapi.response.AbstractNewsRecord;
 
@@ -30,4 +31,7 @@ import eu.qwsome.xapi.response.AbstractNewsRecord;
 @ToString
 public class SNewsRecord extends AbstractNewsRecord {
 
+  public SNewsRecord(final JSONObject ob) {
+    super(ob);
+  }
 }

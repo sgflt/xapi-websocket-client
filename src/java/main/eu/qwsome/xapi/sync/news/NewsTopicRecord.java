@@ -34,13 +34,12 @@ import eu.qwsome.xapi.response.AbstractNewsRecord;
 @Getter
 public class NewsTopicRecord extends AbstractNewsRecord {
 
-  private String timeString;
-  private int bodylen;
+  private final String timeString;
+  private final int bodylen;
 
 
-  @Override
-  public void setFieldsFromJSONObject(final JSONObject ob) {
-    super.setFieldsFromJSONObject(ob);
+  public NewsTopicRecord(final JSONObject ob) {
+    super(ob);
     this.timeString = ob.getString("timeString");
     this.bodylen = ob.getInt("bodylen");
   }

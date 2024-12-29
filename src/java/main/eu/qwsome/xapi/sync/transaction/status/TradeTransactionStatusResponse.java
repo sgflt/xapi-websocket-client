@@ -42,7 +42,7 @@ public class TradeTransactionStatusResponse extends SynchronousResponse {
   private final String customComment;
 
 
-  public TradeTransactionStatusResponse(final String body) {
+  public TradeTransactionStatusResponse(final JSONObject body) {
     super(body);
 
     final var ob = (JSONObject) this.getReturnData();

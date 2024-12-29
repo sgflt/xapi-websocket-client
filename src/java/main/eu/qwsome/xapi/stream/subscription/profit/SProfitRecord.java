@@ -27,20 +27,17 @@ import lombok.Getter;
 import lombok.ToString;
 import org.json.JSONObject;
 
-import eu.qwsome.xapi.response.BaseResponseRecord;
-
 @Getter
 @ToString
-public class SProfitRecord implements BaseResponseRecord {
+public class SProfitRecord {
 
-  private long order;
-  private long order2;
-  private long position;
-  private double profit;
+  private final long order;
+  private final long order2;
+  private final long position;
+  private final double profit;
 
 
-  @Override
-  public void setFieldsFromJSONObject(final JSONObject e) {
+  public SProfitRecord(final JSONObject e) {
     this.order = e.getLong("order");
     this.order2 = e.getLong("order2");
     this.position = e.getLong("position");

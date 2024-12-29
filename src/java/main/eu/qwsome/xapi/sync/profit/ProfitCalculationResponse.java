@@ -36,9 +36,9 @@ public class ProfitCalculationResponse extends SynchronousResponse {
   private Double profit;
 
 
-  public ProfitCalculationResponse(final String body) {
+  public ProfitCalculationResponse(final JSONObject body) {
     super(body);
-    final var ob = (JSONObject) this.getReturnData();
+    final var ob = (JSONObject) getReturnData();
     if (ob != null) {
       this.profit = (Double) ob.get("profit");
     }

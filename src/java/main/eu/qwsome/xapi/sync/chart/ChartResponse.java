@@ -40,7 +40,7 @@ public class ChartResponse extends SynchronousResponse {
   private final List<RateInfoRecord> rateInfos;
 
 
-  public ChartResponse(final String body) {
+  public ChartResponse(final JSONObject body) {
     super(body);
 
     final var rd = (JSONObject) getReturnData();
@@ -49,8 +49,7 @@ public class ChartResponse extends SynchronousResponse {
     final var arr = rd.getJSONArray("rateInfos");
     for (final var o : arr) {
       final var e = (JSONObject) o;
-      final var rateInfo = new RateInfoRecord();
-      rateInfo.setFieldsFromJSONObject(e);
+      final var rateInfo = new RateInfoRecord(e);
       this.rateInfos.add(rateInfo);
     }
   }

@@ -36,7 +36,7 @@ public class MarginTradeResponse extends SynchronousResponse {
   private double margin;
 
 
-  public MarginTradeResponse(final String body) {
+  public MarginTradeResponse(final JSONObject body) {
     super(body);
 
     final var rd = (JSONObject) this.getReturnData();

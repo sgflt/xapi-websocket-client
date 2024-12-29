@@ -29,25 +29,22 @@ import lombok.Getter;
 import lombok.ToString;
 import org.json.JSONObject;
 
-import eu.qwsome.xapi.response.BaseResponseRecord;
-
 @Getter
 @ToString
-public class SCandleRecord implements BaseResponseRecord {
+public class SCandleRecord {
 
-  private Instant ctm;
-  private String ctmString;
-  private double open;
-  private double high;
-  private double low;
-  private double close;
-  private double vol;
-  private int quoteId;
-  private String symbol;
+  private final Instant ctm;
+  private final String ctmString;
+  private final double open;
+  private final double high;
+  private final double low;
+  private final double close;
+  private final double vol;
+  private final int quoteId;
+  private final String symbol;
 
 
-  @Override
-  public void setFieldsFromJSONObject(final JSONObject ob) {
+  public SCandleRecord(final JSONObject ob) {
     this.ctm = Instant.ofEpochMilli(ob.getLong("ctm"));
     this.ctmString = ob.getString("ctmString");
     this.symbol = ob.getString("symbol");

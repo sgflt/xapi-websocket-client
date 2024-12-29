@@ -28,21 +28,19 @@ import lombok.ToString;
 import org.json.JSONObject;
 
 import eu.qwsome.xapi.codes.RequestStatus;
-import eu.qwsome.xapi.response.BaseResponseRecord;
 
 @Getter
 @ToString
-public class STradeStatusRecord implements BaseResponseRecord {
+public class STradeStatusRecord {
 
-  private int order;
-  private RequestStatus requestStatus;
-  private String message;
-  private String customComment;
-  private double price;
+  private final int order;
+  private final RequestStatus requestStatus;
+  private final String message;
+  private final String customComment;
+  private final double price;
 
 
-  @Override
-  public void setFieldsFromJSONObject(final JSONObject ob) {
+  public STradeStatusRecord(final JSONObject ob) {
     this.order = ob.getInt("order");
     this.price = ob.getDouble("price");
     this.requestStatus = new RequestStatus(ob.getLong("requestStatus"));

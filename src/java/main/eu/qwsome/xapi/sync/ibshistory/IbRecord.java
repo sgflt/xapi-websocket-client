@@ -25,37 +25,34 @@ package eu.qwsome.xapi.sync.ibshistory;
 
 import java.time.Instant;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 import org.json.JSONObject;
 
-import eu.qwsome.xapi.response.BaseResponseRecord;
+@Getter
+@ToString
+public class IbRecord {
 
-@Data
-public class IbRecord implements BaseResponseRecord {
-
-  private String surname;
-  private Integer side;
-  private Double openPrice;
-  private Double nominal;
-  private Double closePrice;
-  private String symbol;
-  private Double volume;
-  private String login;
-  private Instant timestamp;
+  private final String surname;
+  private final Integer side;
+  private final Double openPrice;
+  private final Double nominal;
+  private final Double closePrice;
+  private final String symbol;
+  private final Double volume;
+  private final String login;
+  private final Instant timestamp;
 
 
-  @Override
-  public void setFieldsFromJSONObject(final JSONObject ob) {
-    if (ob != null) {
-      this.symbol = ob.getString("symbol");
-      this.surname = ob.getString("surname");
-      this.login = ob.getString("login");
-      this.openPrice = ob.getDouble("openPrice");
-      this.nominal = ob.getDouble("nominal");
-      this.closePrice = ob.getDouble("closePrice");
-      this.volume = ob.getDouble("volume");
-      this.timestamp = Instant.ofEpochMilli(ob.getLong("timestamp"));
-      this.side = ob.getInt("side");
-    }
+  public IbRecord(final JSONObject ob) {
+    this.symbol = ob.getString("symbol");
+    this.surname = ob.getString("surname");
+    this.login = ob.getString("login");
+    this.openPrice = ob.getDouble("openPrice");
+    this.nominal = ob.getDouble("nominal");
+    this.closePrice = ob.getDouble("closePrice");
+    this.volume = ob.getDouble("volume");
+    this.timestamp = Instant.ofEpochMilli(ob.getLong("timestamp"));
+    this.side = ob.getInt("side");
   }
 }

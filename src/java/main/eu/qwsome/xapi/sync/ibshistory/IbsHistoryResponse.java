@@ -41,15 +41,14 @@ public class IbsHistoryResponse extends SynchronousResponse {
   private final List<IbRecord> ibRecords;
 
 
-  public IbsHistoryResponse(final String body) {
+  public IbsHistoryResponse(final JSONObject body) {
     super(body);
     final var ib = (JSONArray) this.getReturnData();
     this.ibRecords = new ArrayList<>(ib.length());
 
     for (final var o : ib) {
       final var e = (JSONObject) o;
-      final var ibRecord = new IbRecord();
-      ibRecord.setFieldsFromJSONObject(e);
+      final var ibRecord = new IbRecord(e);
       this.ibRecords.add(ibRecord);
     }
   }

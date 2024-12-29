@@ -27,22 +27,19 @@ import lombok.Getter;
 import lombok.ToString;
 import org.json.JSONObject;
 
-import eu.qwsome.xapi.response.BaseResponseRecord;
-
 @Getter
 @ToString
-public class SBalanceRecord implements BaseResponseRecord {
+public class SBalanceRecord {
 
-  private double balance;
-  private double margin;
-  private double equity;
-  private double marginLevel;
-  private double marginFree;
-  private double credit;
+  private final double balance;
+  private final double margin;
+  private final double equity;
+  private final double marginLevel;
+  private final double marginFree;
+  private final double credit;
 
 
-  @Override
-  public void setFieldsFromJSONObject(final JSONObject ob) {
+  public SBalanceRecord(final JSONObject ob) {
     this.balance = ob.getDouble("balance");
     this.margin = ob.getDouble("margin");
     this.credit = ob.getDouble("credit");

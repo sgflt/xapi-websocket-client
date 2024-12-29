@@ -41,10 +41,10 @@ public class CurrentUserDataResponse extends SynchronousResponse {
   private final boolean ibAccount;
 
 
-  public CurrentUserDataResponse(final String body) {
+  public CurrentUserDataResponse(final JSONObject body) {
     super(body);
 
-    final var ob = (JSONObject) this.getReturnData();
+    final var ob = (JSONObject) getReturnData();
     this.currency = ob.getString("currency");
     this.spreadType = ob.getString("spreadType");
     this.group = ob.getString("group");

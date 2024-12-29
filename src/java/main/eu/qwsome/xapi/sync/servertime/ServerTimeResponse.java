@@ -36,10 +36,10 @@ public class ServerTimeResponse extends SynchronousResponse {
   private final long time;
 
 
-  public ServerTimeResponse(final String body) {
+  public ServerTimeResponse(final JSONObject body) {
     super(body);
 
-    final var ob = (JSONObject) this.getReturnData();
+    final var ob = (JSONObject) getReturnData();
     this.time = ob.getLong("time");
   }
 }

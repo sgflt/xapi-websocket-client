@@ -42,9 +42,8 @@ public abstract class SynchronousResponse {
   private final String streamSessionId;
 
 
-  public SynchronousResponse(final String body) {
+  protected SynchronousResponse(final JSONObject ob) {
     try {
-      final var ob = new JSONObject(body);
       this.status = ob.getBoolean("status");
       this.errCode = ob.has("errorCode") ? new ErrorCode(ob.getString("errorCode")) : null;
       this.errorDescr = ob.optString("errorDescr");
@@ -58,7 +57,7 @@ public abstract class SynchronousResponse {
 
       parseRedirect(ob);
     } catch (final JSONException e) {
-      throw new XtbApiException("JSON Parse exception: " + body);
+      throw new XtbApiException("JSON Parse exception: " + ob);
     }
   }
 

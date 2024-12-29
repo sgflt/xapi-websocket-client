@@ -39,11 +39,11 @@ import eu.qwsome.xapi.sync.SynchronousResponse;
 public class TradingHoursResponse extends SynchronousResponse {
 
   private final List<String> symbols;
-  private final List<List<HoursRecord>> quotes = new LinkedList<List<HoursRecord>>();
-  private final List<List<HoursRecord>> trading = new LinkedList<List<HoursRecord>>();
+  private final List<List<HoursRecord>> quotes = new LinkedList<>();
+  private final List<List<HoursRecord>> trading = new LinkedList<>();
 
 
-  public TradingHoursResponse(final String body) {
+  public TradingHoursResponse(final JSONObject body) {
     super(body);
 
     final var aHR = (JSONArray) this.getReturnData();
@@ -57,8 +57,7 @@ public class TradingHoursResponse extends SynchronousResponse {
       final var qHR = (JSONArray) ob.get("quotes");
       final var quotesList = new ArrayList<HoursRecord>(qHR.length());
       for (final var e : qHR) {
-        final var rec = new HoursRecord();
-        rec.setFieldsFromJSONObject((JSONObject) e);
+        final var rec = new HoursRecord((JSONObject) e);
         quotesList.add(rec);
       }
       this.quotes.add(quotesList);
@@ -66,8 +65,7 @@ public class TradingHoursResponse extends SynchronousResponse {
       final var tHR = (JSONArray) ob.get("trading");
       final var tradingList = new ArrayList<HoursRecord>(tHR.length());
       for (final var e : tHR) {
-        final var rec = new HoursRecord();
-        rec.setFieldsFromJSONObject((JSONObject) e);
+        final var rec = new HoursRecord((JSONObject) e);
         tradingList.add(rec);
       }
 

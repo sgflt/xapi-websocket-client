@@ -23,21 +23,20 @@
 package eu.qwsome.xapi.sync.tradinghours;
 
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 import org.json.JSONObject;
 
-import eu.qwsome.xapi.response.BaseResponseRecord;
+@Getter
+@ToString
+public class HoursRecord {
 
-@Data
-public class HoursRecord implements BaseResponseRecord {
-
-  private long day;
-  private long fromT;
-  private long toT;
+  private final long day;
+  private final long fromT;
+  private final long toT;
 
 
-  @Override
-  public void setFieldsFromJSONObject(final JSONObject ob) {
+  public HoursRecord(final JSONObject ob) {
     this.day = ob.getLong("day");
     this.fromT = ob.getLong("fromT");
     this.toT = ob.getLong("toT");

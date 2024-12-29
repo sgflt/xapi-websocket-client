@@ -42,17 +42,16 @@ public class TickPricesResponse extends SynchronousResponse {
   private final List<TickRecord> ticks;
 
 
-  public TickPricesResponse(final String body) throws XtbApiException, XAPIResponseException {
+  public TickPricesResponse(final JSONObject body) throws XtbApiException, XAPIResponseException {
     super(body);
 
-    final var ob = (JSONObject) this.getReturnData();
+    final var ob = (JSONObject) getReturnData();
     final var arr = (JSONArray) ob.get("quotations");
     this.ticks = new ArrayList<>(arr.length());
 
     for (final var o : arr) {
       final var e = (JSONObject) o;
-      final var tickRecord = new TickRecord();
-      tickRecord.setFieldsFromJSONObject(e);
+      final var tickRecord = new TickRecord(e);
       this.ticks.add(tickRecord);
     }
   }

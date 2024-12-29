@@ -40,15 +40,14 @@ public class CalendarResponse extends SynchronousResponse {
   private final List<CalendarRecord> calendarRecords;
 
 
-  public CalendarResponse(final String body) {
+  public CalendarResponse(final JSONObject body) {
     super(body);
-    final JSONArray arr = (JSONArray) this.getReturnData();
+    final JSONArray arr = (JSONArray) getReturnData();
     this.calendarRecords = new ArrayList<>(arr.length());
 
     for (final var o : arr) {
       final var e = (JSONObject) o;
-      final var calendarRecord = new CalendarRecord();
-      calendarRecord.setFieldsFromJSONObject(e);
+      final var calendarRecord = new CalendarRecord(e);
       this.calendarRecords.add(calendarRecord);
     }
   }

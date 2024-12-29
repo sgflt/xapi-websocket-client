@@ -23,39 +23,26 @@
 package eu.qwsome.xapi.sync.commisiondef;
 
 
+import lombok.Getter;
+import lombok.ToString;
 import org.json.JSONObject;
 
 import eu.qwsome.xapi.sync.SynchronousResponse;
 
+@Getter
+@ToString
 public class CommissionDefResponse extends SynchronousResponse {
 
   private double commission;
   private double rateOfExchange;
 
 
-  public CommissionDefResponse(final String body) {
+  public CommissionDefResponse(final JSONObject body) {
     super(body);
-    final var rd = (JSONObject) this.getReturnData();
+    final var rd = (JSONObject) getReturnData();
     if (rd != null) {
       this.commission = (Double) rd.get("commission");
       this.rateOfExchange = (Double) rd.get("rateOfExchange");
     }
-  }
-
-
-  public double getCommission() {
-    return this.commission;
-  }
-
-
-  public double getRateOfExchange() {
-    return this.rateOfExchange;
-  }
-
-
-  @Override
-  public String toString() {
-    return "CommissionDefResponse [commission=" + this.commission
-           + ", rateOfExchange=" + this.rateOfExchange + "]";
   }
 }

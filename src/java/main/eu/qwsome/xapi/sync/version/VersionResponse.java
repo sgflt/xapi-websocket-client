@@ -38,10 +38,10 @@ public class VersionResponse extends SynchronousResponse {
   private final String version;
 
 
-  public VersionResponse(final String body) throws XtbApiException, XAPIResponseException {
+  public VersionResponse(final JSONObject body) throws XtbApiException, XAPIResponseException {
     super(body);
 
-    final var ob = (JSONObject) this.getReturnData();
+    final var ob = (JSONObject) getReturnData();
     this.version = ob.getString("version");
   }
 }

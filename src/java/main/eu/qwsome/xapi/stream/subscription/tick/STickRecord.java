@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2024 Lukáš Kvídera
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * Permission is hereby granted, free of charge, to any person jsontaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
  * the Software without restriction, including without limitation the rights to
  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
@@ -29,43 +29,39 @@ import lombok.Getter;
 import lombok.ToString;
 import org.json.JSONObject;
 
-import eu.qwsome.xapi.response.BaseResponseRecord;
-
 @Getter
 @ToString
-public class STickRecord implements BaseResponseRecord {
+public class STickRecord {
+  private final double ask;
+  private final double bid;
+  private final Integer askVolume;
+  private final Integer bidVolume;
+  private final double high;
+  private final double low;
+  private final double spreadRaw;
+  private final double spreadTable;
+  private final String symbol;
+  private final int quoteId;
+  private final int level;
+  private final Instant timestamp;
 
-  private double ask;
-  private double bid;
-  private Integer askVolume;
-  private Integer bidVolume;
-  private double high;
-  private double low;
-  private double spreadRaw;
-  private double spreadTable;
-  private String symbol;
-  private int quoteId;
-  private int level;
-  private Instant timestamp;
 
+  public STickRecord(final JSONObject json) {
+    this.ask = json.getDouble("ask");
+    this.bid = json.getDouble("bid");
 
-  @Override
-  public void setFieldsFromJSONObject(final JSONObject ob) {
-    this.ask = ob.getDouble("ask");
-    this.bid = ob.getDouble("bid");
+    this.spreadRaw = json.getDouble("spreadRaw");
+    this.spreadTable = json.getDouble("spreadTable");
 
-    this.spreadRaw = ob.getDouble("spreadRaw");
-    this.spreadTable = ob.getDouble("spreadTable");
+    this.askVolume = json.getInt("askVolume");
+    this.bidVolume = json.getInt("bidVolume");
 
-    this.askVolume = ob.getInt("askVolume");
-    this.bidVolume = ob.getInt("bidVolume");
+    this.high = json.getDouble("high");
+    this.low = json.getDouble("low");
 
-    this.high = ob.getDouble("high");
-    this.low = ob.getDouble("low");
-
-    this.symbol = ob.getString("symbol");
-    this.timestamp = Instant.ofEpochMilli(ob.getLong("timestamp"));
-    this.level = ob.getInt("level");
-    this.quoteId = ob.getInt("quoteId");
+    this.symbol = json.getString("symbol");
+    this.timestamp = Instant.ofEpochMilli(json.getLong("timestamp"));
+    this.level = json.getInt("level");
+    this.quoteId = json.getInt("quoteId");
   }
 }

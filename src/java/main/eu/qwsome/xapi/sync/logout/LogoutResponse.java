@@ -23,17 +23,15 @@
 package eu.qwsome.xapi.sync.logout;
 
 
+import lombok.ToString;
+import org.json.JSONObject;
+
 import eu.qwsome.xapi.sync.SynchronousResponse;
 
+@ToString
 public class LogoutResponse extends SynchronousResponse {
 
-  public LogoutResponse(final String body) {
+  public LogoutResponse(final JSONObject body) {
     super(body);
-  }
-
-
-  @Override
-  public String toString() {
-    return "LogoutResponse{" + '}';
   }
 }

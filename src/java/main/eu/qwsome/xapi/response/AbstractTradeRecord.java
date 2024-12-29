@@ -31,46 +31,63 @@ import org.json.JSONObject;
 
 @Getter
 @ToString
-public abstract class AbstractTradeRecord implements BaseResponseRecord {
+public abstract class AbstractTradeRecord {
 
-  private double closePrice;
-  private boolean closed;
-  private int cmd;
-  private String comment;
-  private String customComment;
-  private double commission;
-  private long order;
-  private long order2;
-  private double volume;
-  private double marginRate;
-  private double openPrice;
-  private String symbol;
-  private double storage;
-  private int digits;
-
-  protected Instant closeTime;
-  protected Instant expiration;
-  protected long position;
-  protected double profit;
-  protected double sl;
-  protected double tp;
+  private final double closePrice;
+  private final boolean closed;
+  private final int cmd;
+  private final String comment;
+  private final String customComment;
+  private final double commission;
+  private final long order;
+  private final long order2;
+  private final double volume;
+  private final double marginRate;
+  private final double openPrice;
+  private final String symbol;
+  private final double storage;
+  private final int digits;
 
 
-  @Override
-  public void setFieldsFromJSONObject(final JSONObject ob) {
-    this.closePrice = ob.getDouble("close_price");
-    this.closed = ob.getBoolean("closed");
-    this.cmd = ob.getInt("cmd");
-    this.comment = ob.optString("comment");
-    this.customComment = ob.optString("customComment");
-    this.commission = ob.getDouble("commission");
-    this.order = ob.getLong("order");
-    this.order2 = ob.getLong("order2");
-    this.volume = ob.getDouble("volume");
-    this.marginRate = ob.getDouble("margin_rate");
-    this.openPrice = ob.getDouble("open_price");
-    this.symbol = ob.getString("symbol");
-    this.storage = ob.getDouble("storage");
-    this.digits = ob.getInt("digits");
+  private final Instant openTime;
+  private final Instant closeTime;
+  private final Instant expiration;
+  private final long position;
+  private final double profit;
+  private final double sl;
+  private final double tp;
+
+
+  protected AbstractTradeRecord(final JSONObject json) {
+    this.closePrice = json.getDouble("close_price");
+    this.closed = json.getBoolean("closed");
+    this.cmd = json.getInt("cmd");
+    this.comment = json.optString("comment");
+    this.customComment = json.optString("customComment");
+    this.commission = json.getDouble("commission");
+    this.order = json.getLong("order");
+    this.order2 = json.getLong("order2");
+    this.volume = json.getDouble("volume");
+    this.marginRate = json.getDouble("margin_rate");
+    this.openPrice = json.getDouble("open_price");
+    this.symbol = json.getString("symbol");
+    this.storage = json.getDouble("storage");
+    this.digits = json.getInt("digits");
+
+    final var openTime = json.getLong("open_time");
+    this.openTime = Instant.ofEpochMilli(openTime);
+
+    final var closeTime = json.optLongObject("close_time", null);
+    this.closeTime = closeTime == null ? null : Instant.ofEpochMilli(closeTime);
+
+    final var expiration1 = json.optLongObject("expiration", null);
+    this.expiration = expiration1 == null ? null : Instant.ofEpochMilli(expiration1);
+
+    this.position = json.getLong("position");
+
+    this.profit = json.optDouble("profit");
+
+    this.sl = json.getDouble("sl");
+    this.tp = json.getDouble("tp");
   }
 }

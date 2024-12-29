@@ -33,8 +33,9 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
-import eu.qwsome.xapi.sync.ResponseParser;
+import eu.qwsome.xapi.error.XtbApiException;
 import eu.qwsome.xapi.sync.chart.ChartResponse;
 import eu.qwsome.xapi.sync.login.LoginResponse;
 import eu.qwsome.xapi.sync.symbol.SymbolResponse;
@@ -83,26 +84,27 @@ public class MainWebsocketListener extends WebSocketListener {
     log.debug("command {} | onMessage {}", this.command, text);
 
     try {
+      final var json = new JSONObject(text);
       final var lastCommand = this.command.pop();
       if ("login".equals(lastCommand)) {
-        this.loginSubject.onSuccess(new ResponseParser().parseLogin(text));
+        this.loginSubject.onSuccess(new LoginResponse(json));
       } else if (
           "buy".equals(lastCommand)
           || "sell".equals(lastCommand)
           || "closeBuy".equals(lastCommand)
           || "closeSell".equals(lastCommand)
       ) {
-        this.tradeTransactionSubject.onSuccess(new ResponseParser().parseTradeTransaction(text));
+        this.tradeTransactionSubject.onSuccess(new TradeTransactionResponse(json));
       } else if ("allSymbols".equals(lastCommand)) {
-        this.allSymbolsSubject.onSuccess(new ResponseParser().parseAllSymbols(text));
+        this.allSymbolsSubject.onSuccess(new AllSymbolsResponse(json));
       } else if ("getSymbol".equals(lastCommand)) {
-        this.getSymbolSubject.onSuccess(new ResponseParser().parseGetSymbol(text));
+        this.getSymbolSubject.onSuccess(new SymbolResponse(json));
       } else if ("getTrades".equals(lastCommand)) {
-        this.getTradesSubject.onSuccess((new ResponseParser().parseGetTrades(text)));
+        this.getTradesSubject.onSuccess(new TradeRecordsResponse(json));
       } else if ("transactionStatus".equals(lastCommand)) {
-        this.tradeTransactionStatusSubject.onSuccess(new ResponseParser().parseTradeTransactionStatus(text));
+        this.tradeTransactionStatusSubject.onSuccess(new TradeTransactionStatusResponse(json));
       } else if ("getChartLastRequest".equals(lastCommand)) {
-        this.getChartLastRequestSubject.onSuccess(new ResponseParser().parseGetChartLastRequest(text));
+        this.getChartLastRequestSubject.onSuccess(new ChartResponse(json));
       }
     } catch (final Exception e) {
       onFailure(webSocket, e, null);
@@ -117,7 +119,7 @@ public class MainWebsocketListener extends WebSocketListener {
       this.command.put(command);
     } catch (final InterruptedException e) {
       Thread.currentThread().interrupt();
-      throw new RuntimeException(e);
+      throw new XtbApiException("Execution interrupted");
     }
   }
 

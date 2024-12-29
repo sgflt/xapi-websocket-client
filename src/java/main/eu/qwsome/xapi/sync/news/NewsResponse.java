@@ -40,7 +40,7 @@ public class NewsResponse extends SynchronousResponse {
   private final List<NewsTopicRecord> newsTopicRecords;
 
 
-  public NewsResponse(final String body) {
+  public NewsResponse(final JSONObject body) {
     super(body);
 
     final var arr = (JSONArray) this.getReturnData();
@@ -48,8 +48,7 @@ public class NewsResponse extends SynchronousResponse {
 
     for (final var o : arr) {
       final var e = (JSONObject) o;
-      final var newsTopicRecord = new NewsTopicRecord();
-      newsTopicRecord.setFieldsFromJSONObject(e);
+      final var newsTopicRecord = new NewsTopicRecord(e);
       this.newsTopicRecords.add(newsTopicRecord);
     }
   }

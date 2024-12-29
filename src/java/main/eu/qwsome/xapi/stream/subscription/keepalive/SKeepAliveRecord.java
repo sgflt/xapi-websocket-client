@@ -29,17 +29,14 @@ import lombok.Getter;
 import lombok.ToString;
 import org.json.JSONObject;
 
-import eu.qwsome.xapi.response.BaseResponseRecord;
-
 @Getter
 @ToString
-public class SKeepAliveRecord implements BaseResponseRecord {
+public class SKeepAliveRecord {
 
-  private Instant timestamp;
+  private final Instant timestamp;
 
 
-  @Override
-  public void setFieldsFromJSONObject(final JSONObject ob) {
+  public SKeepAliveRecord(final JSONObject ob) {
     this.timestamp = Instant.ofEpochMilli(ob.getLong("timestamp"));
   }
 }

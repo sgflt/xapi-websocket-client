@@ -23,33 +23,32 @@
 package eu.qwsome.xapi.sync.calendar;
 
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 import org.json.JSONObject;
 
-import eu.qwsome.xapi.response.BaseResponseRecord;
+@Getter
+@ToString
+public class CalendarRecord {
 
-@Data
-public class CalendarRecord implements BaseResponseRecord {
-
-  private String country;
-  private String current;
-  private String forecast;
-  private String impact;
-  private String period;
-  private String previous;
-  private long time;
-  private String title;
+  private final String country;
+  private final String current;
+  private final String forecast;
+  private final String impact;
+  private final String period;
+  private final String previous;
+  private final long time;
+  private final String title;
 
 
-  @Override
-  public void setFieldsFromJSONObject(final JSONObject e) {
-    this.setCountry(e.getString("country"));
-    this.setCurrent(e.getString("current"));
-    this.setForecast(e.getString("forecast"));
-    this.setImpact(e.getString("impact"));
-    this.setPeriod(e.getString("period"));
-    this.setPrevious(e.getString("previous"));
-    this.setTitle(e.getString("title"));
-    this.setTime(e.getLong("time"));
+  public CalendarRecord(final JSONObject e) {
+    this.country = e.getString("country");
+    this.current = e.getString("current");
+    this.forecast = e.getString("forecast");
+    this.impact = e.getString("impact");
+    this.period = e.getString("period");
+    this.previous = e.getString("previous");
+    this.title = e.getString("title");
+    this.time = e.getLong("time");
   }
 }

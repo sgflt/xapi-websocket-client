@@ -29,27 +29,24 @@ import lombok.Getter;
 import lombok.ToString;
 import org.json.JSONObject;
 
-import eu.qwsome.xapi.response.BaseResponseRecord;
-
 @Getter
 @ToString
-public class TickRecord implements BaseResponseRecord {
+public class TickRecord {
 
-  private double ask;
-  private double bid;
-  private long askVolume;
-  private long bidVolume;
-  private double high;
-  private double low;
-  private String symbol;
-  private Instant timestamp;
-  private int level;
-  private double spreadRaw;
-  private double spreadTable;
+  private final double ask;
+  private final double bid;
+  private final long askVolume;
+  private final long bidVolume;
+  private final double high;
+  private final double low;
+  private final String symbol;
+  private final Instant timestamp;
+  private final int level;
+  private final double spreadRaw;
+  private final double spreadTable;
 
 
-  @Override
-  public void setFieldsFromJSONObject(final JSONObject ob) {
+  public TickRecord(final JSONObject ob) {
     this.ask = ob.getDouble("ask");
     this.bid = ob.getDouble("bid");
     this.askVolume = ob.optLong("askVolume");

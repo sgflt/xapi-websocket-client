@@ -40,14 +40,13 @@ public class AllSymbolsResponse extends SynchronousResponse {
   private final List<SymbolRecord> symbolRecords;
 
 
-  public AllSymbolsResponse(final String body) {
+  public AllSymbolsResponse(final JSONObject body) {
     super(body);
     final var symbols = (JSONArray) this.getReturnData();
     this.symbolRecords = new ArrayList<>(symbols.length());
     for (final var symbol : symbols) {
       final JSONObject e = (JSONObject) symbol;
-      final var symbolRecord = new SymbolRecord();
-      symbolRecord.setFieldsFromJSONObject(e);
+      final var symbolRecord = new SymbolRecord(e);
       this.symbolRecords.add(symbolRecord);
     }
   }

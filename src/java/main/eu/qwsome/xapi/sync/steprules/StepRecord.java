@@ -27,18 +27,15 @@ import lombok.Getter;
 import lombok.ToString;
 import org.json.JSONObject;
 
-import eu.qwsome.xapi.response.BaseResponseRecord;
-
 @Getter
 @ToString
-public class StepRecord implements BaseResponseRecord {
+public class StepRecord {
 
-  private double fromValue;
-  private double step;
+  private final double fromValue;
+  private final double step;
 
 
-  @Override
-  public void setFieldsFromJSONObject(final JSONObject ob) {
+  public StepRecord(final JSONObject ob) {
     this.fromValue = ob.getDouble("fromValue");
     this.step = ob.getDouble("step");
   }
