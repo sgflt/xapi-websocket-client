@@ -46,7 +46,7 @@ public class CurrentUserDataResponse extends SynchronousResponse {
 
     final var ob = (JSONObject) getReturnData();
     this.currency = ob.getString("currency");
-    this.spreadType = ob.getString("spreadType");
+    this.spreadType = ob.optString("spreadType");
     this.group = ob.getString("group");
     this.leverageMultiplier = ob.getDouble("leverageMultiplier");
     this.companyUnit = ob.getInt("companyUnit");
