@@ -37,6 +37,7 @@ import org.json.JSONObject;
 
 import eu.qwsome.xapi.error.XtbApiException;
 import eu.qwsome.xapi.sync.chart.ChartResponse;
+import eu.qwsome.xapi.sync.currentuserdata.CurrentUserDataResponse;
 import eu.qwsome.xapi.sync.login.LoginResponse;
 import eu.qwsome.xapi.sync.symbol.SymbolResponse;
 import eu.qwsome.xapi.sync.symbol.all.AllSymbolsResponse;
@@ -60,7 +61,23 @@ public class MainWebsocketListener extends WebSocketListener {
   private SingleSubject<TradeRecordsResponse> getTradesSubject = SingleSubject.create();
   private SingleSubject<ChartResponse> getChartLastRequestSubject = SingleSubject.create();
 
-  private final LinkedBlockingDeque<String> command = new LinkedBlockingDeque<>(1);
+  private final LinkedBlockingDeque<Command> command = new LinkedBlockingDeque<>(1);
+  private SingleSubject<CurrentUserDataResponse> getCurrentUserDataSubject = SingleSubject.create();
+
+  public enum Command {
+    PING,
+    LOGIN,
+    BUY,
+    CLOSE_BUY,
+    SELL,
+    CLOSE_SELL,
+    GET_ALL_SYMBOLS,
+    GET_SYMBOL,
+    GET_TRADES,
+    GET_TRANSACTION_STATUS,
+    GET_CHART,
+    GET_USER_DATA,
+  }
 
 
   @Override
@@ -86,25 +103,21 @@ public class MainWebsocketListener extends WebSocketListener {
     try {
       final var json = new JSONObject(text);
       final var lastCommand = this.command.pop();
-      if ("login".equals(lastCommand)) {
-        this.loginSubject.onSuccess(new LoginResponse(json));
-      } else if (
-          "buy".equals(lastCommand)
-          || "sell".equals(lastCommand)
-          || "closeBuy".equals(lastCommand)
-          || "closeSell".equals(lastCommand)
-      ) {
-        this.tradeTransactionSubject.onSuccess(new TradeTransactionResponse(json));
-      } else if ("allSymbols".equals(lastCommand)) {
-        this.allSymbolsSubject.onSuccess(new AllSymbolsResponse(json));
-      } else if ("getSymbol".equals(lastCommand)) {
-        this.getSymbolSubject.onSuccess(new SymbolResponse(json));
-      } else if ("getTrades".equals(lastCommand)) {
-        this.getTradesSubject.onSuccess(new TradeRecordsResponse(json));
-      } else if ("transactionStatus".equals(lastCommand)) {
-        this.tradeTransactionStatusSubject.onSuccess(new TradeTransactionStatusResponse(json));
-      } else if ("getChartLastRequest".equals(lastCommand)) {
-        this.getChartLastRequestSubject.onSuccess(new ChartResponse(json));
+      switch (lastCommand) {
+        case Command.LOGIN -> this.loginSubject.onSuccess(new LoginResponse(json));
+        case Command.BUY,
+             Command.SELL,
+             Command.CLOSE_BUY,
+             Command.CLOSE_SELL -> this.tradeTransactionSubject.onSuccess(new TradeTransactionResponse(json));
+        case Command.GET_ALL_SYMBOLS -> this.allSymbolsSubject.onSuccess(new AllSymbolsResponse(json));
+        case Command.GET_SYMBOL -> this.getSymbolSubject.onSuccess(new SymbolResponse(json));
+        case Command.GET_TRADES -> this.getTradesSubject.onSuccess(new TradeRecordsResponse(json));
+        case Command.GET_TRANSACTION_STATUS ->
+            this.tradeTransactionStatusSubject.onSuccess(new TradeTransactionStatusResponse(json));
+        case Command.GET_CHART -> this.getChartLastRequestSubject.onSuccess(new ChartResponse(json));
+        case Command.GET_USER_DATA -> this.getCurrentUserDataSubject.onSuccess(new CurrentUserDataResponse(json));
+        case Command.PING -> log.trace("PING {}", text);
+        default -> throw new IllegalStateException("Unexpected value: " + lastCommand);
       }
     } catch (final Exception e) {
       onFailure(webSocket, e, null);
@@ -112,7 +125,7 @@ public class MainWebsocketListener extends WebSocketListener {
   }
 
 
-  public void setCommand(final String command) {
+  public void setCommand(final Command command) {
     log.trace("setCommand {}", command);
 
     try {
@@ -163,5 +176,11 @@ public class MainWebsocketListener extends WebSocketListener {
   public Single<ChartResponse> createGetChartLastRequestStream() {
     this.getChartLastRequestSubject = SingleSubject.create();
     return this.getChartLastRequestSubject.observeOn(Schedulers.io());
+  }
+
+
+  public Single<CurrentUserDataResponse> createGetCurrentUserDataStream() {
+    this.getCurrentUserDataSubject = SingleSubject.create();
+    return this.getCurrentUserDataSubject.observeOn(Schedulers.io());
   }
 }

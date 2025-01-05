@@ -69,6 +69,8 @@ import eu.qwsome.xapi.sync.chart.ChartLastCommand;
 import eu.qwsome.xapi.sync.chart.ChartLastInfoRecord;
 import eu.qwsome.xapi.sync.chart.ChartResponse;
 import eu.qwsome.xapi.sync.chart.PeriodCode;
+import eu.qwsome.xapi.sync.currentuserdata.CurrentUserDataCommand;
+import eu.qwsome.xapi.sync.currentuserdata.CurrentUserDataResponse;
 import eu.qwsome.xapi.sync.login.Credentials;
 import eu.qwsome.xapi.sync.login.LoginCommand;
 import eu.qwsome.xapi.sync.login.LoginResponse;
@@ -131,7 +133,7 @@ public class XAPIClient {
 
     this.bucket.consumeUninterruptibly(1);
 
-    this.syncListener.setCommand("ping");
+    this.syncListener.setCommand(MainWebsocketListener.Command.PING);
     this.syncWebsocket.send(new PingCommand().toJSONString());
 
     sendCommand(StreamPingCommand.builder()
@@ -145,7 +147,7 @@ public class XAPIClient {
 
     return this.syncListener.createLoginStream()
         .doOnSubscribe(disposable -> {
-          this.syncListener.setCommand("login");
+          this.syncListener.setCommand(MainWebsocketListener.Command.LOGIN);
           this.syncWebsocket.send(new LoginCommand(credentials).toJSONString());
         }).doOnSuccess(loginResponse -> {
           connectStream(loginResponse.getStreamSessionId());
@@ -177,10 +179,23 @@ public class XAPIClient {
 
     return this.syncListener.createAllSymbolsStream()
         .doOnSubscribe(disposable -> {
-          this.syncListener.setCommand("allSymbols");
+          this.syncListener.setCommand(MainWebsocketListener.Command.GET_ALL_SYMBOLS);
           this.syncWebsocket.send(new AllSymbolsCommand().toJSONString());
         })
         .blockingGet();
+  }
+
+
+  public CurrentUserDataResponse getCurrentUserData() {
+    log.trace("getCurrentUserData()");
+
+    this.bucket.consumeUninterruptibly(1);
+
+    return this.syncListener.createGetCurrentUserDataStream()
+        .doOnSubscribe(disposable -> {
+          this.syncListener.setCommand(MainWebsocketListener.Command.GET_USER_DATA);
+          this.syncWebsocket.send(new CurrentUserDataCommand().toJSONString());
+        }).blockingGet();
   }
 
 
@@ -196,7 +211,7 @@ public class XAPIClient {
 
     return this.syncListener.createGetSymbolStream()
         .doOnSubscribe(disposable -> {
-          this.syncListener.setCommand("getSymbol");
+          this.syncListener.setCommand(MainWebsocketListener.Command.GET_SYMBOL);
           this.syncWebsocket.send(new SymbolCommand(symbol).toJSONString());
         }).blockingGet();
   }
@@ -246,7 +261,7 @@ public class XAPIClient {
 
     return this.syncListener.createGetChartLastRequestStream()
         .doOnSubscribe(disposable -> {
-          this.syncListener.setCommand("getChartLastRequest");
+          this.syncListener.setCommand(MainWebsocketListener.Command.GET_CHART);
           this.syncWebsocket.send(new ChartLastCommand(
               ChartLastInfoRecord.builder()
                   .symbol(symbol)
@@ -265,7 +280,7 @@ public class XAPIClient {
 
     return this.syncListener.createGetTradesStream()
         .doOnSubscribe(disposable -> {
-          this.syncListener.setCommand("getTrades");
+          this.syncListener.setCommand(MainWebsocketListener.Command.GET_TRADES);
           this.syncWebsocket.send(new TradesCommand(openedOnly).toJSONString());
         }).blockingGet();
   }
@@ -278,7 +293,7 @@ public class XAPIClient {
 
     return this.syncListener.createTradeTransactionStatusStream()
         .doOnSubscribe(disposable -> {
-          this.syncListener.setCommand("transactionStatus");
+          this.syncListener.setCommand(MainWebsocketListener.Command.GET_TRANSACTION_STATUS);
           this.syncWebsocket.send(new TradeTransactionStatusCommand(orderId).toJSONString());
         }).blockingGet();
   }
@@ -294,19 +309,19 @@ public class XAPIClient {
           if (
               tradeTransInfoRecord.getCmd().equals(TradeOperationCode.BUY)
               && tradeTransInfoRecord.getType().equals(TradeTransactionType.OPEN)) {
-            this.syncListener.setCommand("buy");
+            this.syncListener.setCommand(MainWebsocketListener.Command.BUY);
           } else if (
               tradeTransInfoRecord.getCmd().equals(TradeOperationCode.SELL)
               && tradeTransInfoRecord.getType().equals(TradeTransactionType.OPEN)) {
-            this.syncListener.setCommand("sell");
+            this.syncListener.setCommand(MainWebsocketListener.Command.SELL);
           } else if (
               tradeTransInfoRecord.getCmd().equals(TradeOperationCode.BUY)
               && tradeTransInfoRecord.getType().equals(TradeTransactionType.CLOSE)) {
-            this.syncListener.setCommand("closeBuy");
+            this.syncListener.setCommand(MainWebsocketListener.Command.CLOSE_BUY);
           } else if (
               tradeTransInfoRecord.getCmd().equals(TradeOperationCode.SELL)
               && tradeTransInfoRecord.getType().equals(TradeTransactionType.CLOSE)) {
-            this.syncListener.setCommand("closeSell");
+            this.syncListener.setCommand(MainWebsocketListener.Command.CLOSE_SELL);
           }
           this.syncWebsocket.send(new TradeTransactionCommand(tradeTransInfoRecord).toJSONString());
         })
