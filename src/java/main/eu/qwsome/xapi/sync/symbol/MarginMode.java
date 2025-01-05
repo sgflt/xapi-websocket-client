@@ -29,6 +29,7 @@ public final class MarginMode extends ResponseCode {
   public static final MarginMode FOREX = new MarginMode(101L);
   public static final MarginMode CFD_LEVERAGED = new MarginMode(102L);
   public static final MarginMode CFD = new MarginMode(103L);
+  public static final MarginMode STC = new MarginMode(104L);
 
 
   public MarginMode(final long code) {
