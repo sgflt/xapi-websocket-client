@@ -46,12 +46,12 @@ public class MarginLevelResponse extends SynchronousResponse {
     super(body);
 
     final var ob = (JSONObject) getReturnData();
-    this.balance = (Double) ob.get("balance");
-    this.credit = (Double) ob.get("credit");
-    this.equity = (Double) ob.get("equity");
+    this.balance = ob.getDouble("balance");
+    this.credit = ob.getDouble("credit");
+    this.equity = ob.getDouble("equity");
     this.currency = ob.getString("currency");
-    this.margin = (Double) ob.get("margin");
-    this.marginFree = (Double) ob.get("margin_free");
-    this.marginLevel = (Double) ob.get("margin_level");
+    this.margin = ob.getDouble("margin");
+    this.marginFree = ob.getDouble("margin_free");
+    this.marginLevel = ob.getDouble("margin_level");
   }
 }
