@@ -74,6 +74,8 @@ import eu.qwsome.xapi.sync.currentuserdata.CurrentUserDataResponse;
 import eu.qwsome.xapi.sync.login.Credentials;
 import eu.qwsome.xapi.sync.login.LoginCommand;
 import eu.qwsome.xapi.sync.login.LoginResponse;
+import eu.qwsome.xapi.sync.margin.level.MarginLevelCommand;
+import eu.qwsome.xapi.sync.margin.level.MarginLevelResponse;
 import eu.qwsome.xapi.sync.ping.PingCommand;
 import eu.qwsome.xapi.sync.symbol.SymbolCommand;
 import eu.qwsome.xapi.sync.symbol.SymbolResponse;
@@ -195,6 +197,19 @@ public class XAPIClient {
         .doOnSubscribe(disposable -> {
           this.syncListener.setCommand(MainWebsocketListener.Command.GET_USER_DATA);
           this.syncWebsocket.send(new CurrentUserDataCommand().toJSONString());
+        }).blockingGet();
+  }
+
+
+  public MarginLevelResponse getMarginLevel() {
+    log.trace("getMarginLevel()");
+
+    this.bucket.consumeUninterruptibly(1);
+
+    return this.syncListener.createGeMarginLevelStream()
+        .doOnSubscribe(disposable -> {
+          this.syncListener.setCommand(MainWebsocketListener.Command.GET_MARGIN_LEVEL);
+          this.syncWebsocket.send(new MarginLevelCommand().toJSONString());
         }).blockingGet();
   }
 

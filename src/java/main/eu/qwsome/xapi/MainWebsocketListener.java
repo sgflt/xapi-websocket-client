@@ -39,6 +39,7 @@ import eu.qwsome.xapi.error.XtbApiException;
 import eu.qwsome.xapi.sync.chart.ChartResponse;
 import eu.qwsome.xapi.sync.currentuserdata.CurrentUserDataResponse;
 import eu.qwsome.xapi.sync.login.LoginResponse;
+import eu.qwsome.xapi.sync.margin.level.MarginLevelResponse;
 import eu.qwsome.xapi.sync.symbol.SymbolResponse;
 import eu.qwsome.xapi.sync.symbol.all.AllSymbolsResponse;
 import eu.qwsome.xapi.sync.trade.TradeRecordsResponse;
@@ -60,9 +61,10 @@ public class MainWebsocketListener extends WebSocketListener {
   private SingleSubject<SymbolResponse> getSymbolSubject = SingleSubject.create();
   private SingleSubject<TradeRecordsResponse> getTradesSubject = SingleSubject.create();
   private SingleSubject<ChartResponse> getChartLastRequestSubject = SingleSubject.create();
+  private SingleSubject<CurrentUserDataResponse> getCurrentUserDataSubject = SingleSubject.create();
+  private SingleSubject<MarginLevelResponse> getMarginLevelSubject = SingleSubject.create();
 
   private final LinkedBlockingDeque<Command> command = new LinkedBlockingDeque<>(1);
-  private SingleSubject<CurrentUserDataResponse> getCurrentUserDataSubject = SingleSubject.create();
 
   public enum Command {
     PING,
@@ -77,6 +79,7 @@ public class MainWebsocketListener extends WebSocketListener {
     GET_TRANSACTION_STATUS,
     GET_CHART,
     GET_USER_DATA,
+    GET_MARGIN_LEVEL,
   }
 
 
@@ -116,6 +119,7 @@ public class MainWebsocketListener extends WebSocketListener {
             this.tradeTransactionStatusSubject.onSuccess(new TradeTransactionStatusResponse(json));
         case Command.GET_CHART -> this.getChartLastRequestSubject.onSuccess(new ChartResponse(json));
         case Command.GET_USER_DATA -> this.getCurrentUserDataSubject.onSuccess(new CurrentUserDataResponse(json));
+        case Command.GET_MARGIN_LEVEL -> this.getMarginLevelSubject.onSuccess(new MarginLevelResponse(json));
         case Command.PING -> log.trace("PING {}", text);
         default -> throw new IllegalStateException("Unexpected value: " + lastCommand);
       }
@@ -182,5 +186,11 @@ public class MainWebsocketListener extends WebSocketListener {
   public Single<CurrentUserDataResponse> createGetCurrentUserDataStream() {
     this.getCurrentUserDataSubject = SingleSubject.create();
     return this.getCurrentUserDataSubject.observeOn(Schedulers.io());
+  }
+
+
+  public Single<MarginLevelResponse> createGeMarginLevelStream() {
+    this.getMarginLevelSubject = SingleSubject.create();
+    return this.getMarginLevelSubject.observeOn(Schedulers.io());
   }
 }
