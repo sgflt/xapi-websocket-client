@@ -29,7 +29,7 @@ import org.json.JSONObject;
 import eu.qwsome.xapi.sync.SynchronousResponse;
 
 @Getter
-@ToString
+@ToString(callSuper = true)
 public class LoginResponse extends SynchronousResponse {
 
   private RedirectRecord redirect;
