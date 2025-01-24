@@ -152,10 +152,18 @@ public class XAPIClient {
           this.syncListener.setCommand(MainWebsocketListener.Command.LOGIN);
           this.syncWebsocket.send(new LoginCommand(credentials).toJSONString());
         }).doOnSuccess(loginResponse -> {
-          connectStream(loginResponse.getStreamSessionId());
+          if (loginResponse.isStatus()) {
+            connectStream(loginResponse.getStreamSessionId());
 
-          Observable.interval(30, TimeUnit.SECONDS)
-              .subscribe(this::keepAlive, throwable -> log.error("keep alive failed", throwable));
+            Observable.interval(30, TimeUnit.SECONDS)
+                .subscribe(this::keepAlive, throwable -> log.error("keep alive failed", throwable));
+          } else {
+            log.error(
+                "Login failed. Avoiding establishing stream connection. {}: {}",
+                loginResponse.getErrCode(),
+                loginResponse.getErrorDescr()
+            );
+          }
         })
         ;
   }
